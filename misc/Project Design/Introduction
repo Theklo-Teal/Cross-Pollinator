@@ -1,0 +1,34 @@
+I'm very much of fan of inheritence. A base script with expected features and helper functions is a template for the then proper functional scripts. Fine State Machines work much like that too. And I can define pseudo mark up languages for declarative script like that.
+
+The Quest system works much like that where a programmer designing quests only really has to think about declaring objects involved in questions and their interactions. Then the dialogues produced and click or character detections are all handled like black boxes by the template script.
+These quest definition scripts are held in "Globals/Quests/".
+
+Characters in this game are very hollow entities. They only hold parameters about their equipment and flavour text and textures and animatons. Their control is actually handled by the game mode director, or the "MapScenario" class, which holds a state machine. The script for equipment/abilities are what actually controls their actions. Characters themselves only know what equipment they allowed to use.
+
+Each equipment (an instance of CharacterAction) is a state in the FSM of a character, but MapScenario is what switches through these states. The equipment can read the perks from characters to modify their behaviour. The character actions and perk tokens are held in "Equipment/".
+
+You can see a map of these interactions with "Chevron_Detachment_Architecture.png".
+
+The info and assets pertaining to Characters are stored in "Characters/". This includes AI scripts ("Robots/") and 3D models and textures. Generally the models are low-poly, but for parts of the game with close ups, models from "Facetime/" would be used.
+
+The AI can difer in behaviour depending on game mode. But it defaults to "gm_generic/" otherwise.
+
+In the "mockups/" folder you find experimental stuff being tested independently from other game stuff. Whereas "UI_Elements/" are the building blocks of UI, which usually are only instanced once.
+
+"Modules/" are basic elements that might be repeatedly instanced.
+
+In "Menus/" is where game menus are stored, those that usually show outside the gameplay, but also pause menus. The "Main_Menu.tscn" is set as the main project scene that loads initially when the project is run.
+
+Each level has a "tactical map", which is an object which draws from "Assets/Map_Tiles/" instance the map according to the level editor plugin ("addons/Tac_Map_Gen/").
+
+Characters are not placed directly in game levels. Instead spawner objects are used. They are instances of "Characters/unit_spawners". They have the ability to make the levels a little more varied by randomizing NPC parameters.
+
+The parameters of player characters are kept track in the save files to stay persistent or be altered during gameplay. These save files are obviously stored in "Savedata/". I wish I could have comment lines in TOML, but whatever. I guess you'll have to figure it out yourself.
+
+All characters and in some "team_*" group. These mark them as hostile, ally, neutral, etc. So the game director controls them differently. This system would allow "mind control" mechanics by just switching their group. But how they can remember and resume back to their original team, I haven't decided yet.
+
+"Levels/" is where most of the meaty gameplay things are. The "Other/" folder has experimental stuff, including a dating sim mock up and sex mechanic experiment. But these would probably become cut features from the game.
+
+There is a separation of "Freeroam/" levels and "Tactics/" levels, but that distinction might not make sense anymore depending on the direction things have been developing. These folders hold actual level data with the MapScenario, which have the FSM directing gameplay and the TacMaps which lay out obstacles and 3D objects. The director FSM uses scripts form "ScenarioStates" as the states. They will be named "gm_*" for "game mode" and depending on the rules of a combat mission or whether it's a freeroam part of the game, a different mode is selected.
+
+I hope the way I designed this game, things are very scalable and features can be extended easily, being possible to add new equipment and game modes quickly and without fussing about much with core functionality.
