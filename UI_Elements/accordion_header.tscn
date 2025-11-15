@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://dfbfwxd8rchpd"]
+
+[ext_resource type="Script" uid="uid://dwfnb522rkjrl" path="res://UI_Elements/accordion_header.gd" id="1_nm5x8"]
+
+[node name="Accordion_Header" type="VBoxContainer"]
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+script = ExtResource("1_nm5x8")

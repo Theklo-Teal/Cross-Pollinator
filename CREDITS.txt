@@ -1,0 +1,30 @@
+Some copyrighted license requiring music might be have been referred, but the files were removed in the public release of the project. That music was meant as inspirational mood boarding.
+The removal of those song might have broken some minor parts of the project.
+
+
+Three 3D character models were taken from free itch.io assets, but I can't find them anymore:
+- Solider.glb (sic)
+- Soldier.glb
+- FemaleFighter.glb
+
+
+Most music was created by Kevin McLeod from incompetech.com. It is properly credited in the running game. Here's a summary:
+
+"Clean Soul.mp3"
+"Dhaka.mp3"
+"Equatorial Complex.mp3"
+"I Can Feel it Coming.mp3"
+"I Feel You.mp3"
+"Industrial Cinematic.mp3"
+"Mirage.mp3"
+"River of Io.mp3"
+"Static Motion.mp3"
+
+Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0
+https://creativecommons.org/licenses/by/4.0/
+
+
+"icebox.mp3" was created by SougetsuOn at www.sougetsu-on.net, Creative Commons with attribution.
+
+All textures were created by Diogo "Theklo" Duarte. Some are "wojaks" used as placeholders for character portraits and are in public domain.

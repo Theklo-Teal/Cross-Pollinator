@@ -1,0 +1,104 @@
+[gd_scene load_steps=4 format=3 uid="uid://7bgancwesocd"]
+
+[sub_resource type="GDScript" id="GDScript_w5w32"]
+script/source = "@tool
+extends ColorRect
+
+@export var redraw : bool = false : set = do_redraw
+func do_redraw(_val):
+	queue_redraw()
+
+@export var text : String = \"Segmented Range\" : set = set_text
+func set_text(val:String):
+	text = val
+	$Label.text = val
+
+@export var max_value : int = 10 : set = set_max_value
+func set_max_value(val:int):
+	max_value = max(val, 2)
+	set_value(value)  # Ensures the current fill value is within the range of max_value
+	queue_redraw()
+
+@export var value : int : set = set_value
+func set_value(val:int):
+	value = clamp(val, 0, max_value)
+	queue_redraw()
+
+@export_group(\"Text Label\")
+@export var show_text : bool = true : set = set_show_text
+func set_show_text(val:bool):
+	show_text = val
+	$Label.visible = val
+
+@export_enum(\"Left\", \"Center\", \"Right\", \"Fill\") var horizontal_alignment : int = 1 : set = set_horiz_align
+func set_horiz_align(val:int):
+	horizontal_alignment = val
+	$Label.horizontal_alignment = val
+@export_enum(\"Top\", \"Center\", \"Bottom\", \"Fill\") var vertical_alignment : int = 1 : set = set_verti_align
+func set_verti_align(val:int):
+	vertical_alignment = val
+	$Label.vertical_alignment = val
+
+@export var label_settings : LabelSettings : set = set_label_settings
+func set_label_settings(val : LabelSettings):
+	label_settings = val
+	$Label.label_settings = val
+
+@export_group(\"Progress Bar\")
+@export var segm_spacing : int = 6 : set = set_spacing
+func set_spacing(val:int):
+	segm_spacing = max(val, 0)
+	queue_redraw()
+
+@export var fill_style : StyleBox : set = set_fill_style
+func set_fill_style(box:StyleBox):
+	fill_style = box
+	queue_redraw()
+
+@export var void_style : StyleBox : set = set_void_style
+func set_void_style(box:StyleBox):
+	void_style = box
+	queue_redraw()
+
+
+func _draw() -> void:
+	var width = (size.x + segm_spacing) / max_value - segm_spacing
+	for n in range(max_value):
+		var segm_pos = Vector2( n * width + n * segm_spacing, 0 )
+		var segm_siz = Vector2( width, size.y)
+		var segm = Rect2( segm_pos, segm_siz )
+		if n < value:
+			draw_style_box(fill_style, segm)
+		else:
+			draw_style_box(void_style, segm)
+"
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8ben4"]
+bg_color = Color(0.194983, 0.449154, 0.351825, 1)
+border_color = Color(0.0235197, 0.361762, 0.242242, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_in4mv"]
+bg_color = Color(0.226707, 0.226708, 0.226707, 1)
+
+[node name="Expanding_Segmented_Range" type="ColorRect"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = SubResource("GDScript_w5w32")
+value = 4
+segm_spacing = 2
+fill_style = SubResource("StyleBoxFlat_8ben4")
+void_style = SubResource("StyleBoxFlat_in4mv")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Segmented Range"
+horizontal_alignment = 1
+vertical_alignment = 1

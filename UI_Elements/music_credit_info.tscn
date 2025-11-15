@@ -1,0 +1,121 @@
+[gd_scene load_steps=7 format=3 uid="uid://baxh3p5tay3vu"]
+
+[ext_resource type="Texture2D" uid="uid://bgf0oqsmbh32h" path="res://Assets/Textures/media_buttons.png" id="1_ps2gq"]
+
+[sub_resource type="GDScript" id="GDScript_imfc7"]
+script/source = "@tool
+extends HBoxContainer
+class_name MusicCreditInfo
+
+@export var stream : AudioStream : set = _set_stream
+@export var url : String
+@export var auto_play := false
+@export_multiline var description : String = \"Public Domain\" : set = _set_description
+var button_group : ButtonGroup : set = _set_button_group
+
+func _set_stream(audiostream:AudioStream):
+	stream = audiostream
+	if is_node_ready():
+		$AudioStreamPlayer.stream = audiostream
+
+func _set_description(text:String):
+	description = text
+	if is_node_ready():
+		%Descript.text = text
+	
+func _set_button_group(group : ButtonGroup):
+	if is_node_ready():
+		%Play_Media.button_group = group
+
+
+func _on_play_media_toggled(indeed:bool):
+	if indeed:
+		$AudioStreamPlayer.play()
+	else:
+		$AudioStreamPlayer.stop()
+	
+func _on_hyperlink_pressed():
+	OS.shell_open(url)
+	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_MINIMIZED)
+
+
+func _ready():
+	%Title.text = name
+	%Hyperlink.visible = not url.is_empty()
+	_set_stream(stream)
+	_set_description(description)
+
+
+func play():
+	%Play_Media.button_pressed = true
+	
+func stop():
+	%Play_Media.button_pressed = false
+"
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dc6kk"]
+atlas = ExtResource("1_ps2gq")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ht3ok"]
+atlas = ExtResource("1_ps2gq")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_od1up"]
+atlas = ExtResource("1_ps2gq")
+region = Rect2(0, 32, 32, 32)
+
+[sub_resource type="LabelSettings" id="LabelSettings_pw5d0"]
+font_size = 20
+font_color = Color(0.614802, 0.665478, 0.315103, 1)
+outline_size = 2
+outline_color = Color(0.615686, 0.666667, 0.313726, 1)
+
+[node name="Music_Credit_Info" type="HBoxContainer" groups=["jukebox"]]
+custom_minimum_size = Vector2(350, 0)
+script = SubResource("GDScript_imfc7")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+alignment = 1
+
+[node name="Play_Media" type="TextureButton" parent="VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+toggle_mode = true
+keep_pressed_outside = true
+texture_normal = SubResource("AtlasTexture_dc6kk")
+texture_pressed = SubResource("AtlasTexture_ht3ok")
+
+[node name="Hyperlink" type="TextureButton" parent="VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+texture_normal = SubResource("AtlasTexture_od1up")
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Title" type="Label" parent="VBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Music_Credit_Info"
+label_settings = SubResource("LabelSettings_pw5d0")
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="Descript" type="RichTextLabel" parent="VBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+focus_mode = 2
+bbcode_enabled = true
+text = "Public Domain"
+fit_content = true
+selection_enabled = true
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+
+[connection signal="toggled" from="VBoxContainer/Play_Media" to="." method="_on_play_media_toggled"]
+[connection signal="pressed" from="VBoxContainer/Hyperlink" to="." method="_on_hyperlink_pressed"]

@@ -1,0 +1,156 @@
+[gd_scene load_steps=3 format=3 uid="uid://bulspylc6cuby"]
+
+[ext_resource type="Texture2D" uid="uid://bfnp3qf1naoae" path="res://Assets/Textures/default_portrait.png" id="1_6pyn4"]
+
+[sub_resource type="GDScript" id="GDScript_6ng5e"]
+script/source = "extends MarginContainer
+
+var default = load(\"res://Assets/Textures/default_portrait.png\")
+
+const DURATION = 2.0
+const max_history : int = 129
+
+var history : Array[String] = [\"\"]
+var chara_history : Array[Character] = [null,]
+var index : int
+
+func _ready():
+	%Content.visible = %Recall.button_pressed
+
+
+func is_recalling():
+	return %Recall.button_pressed
+
+func is_auto():
+	return %Auto.button_pressed
+
+func say(chara:Character, text:String):
+	history.append(text)
+	chara_history.append(chara)
+	if history.size() >= max_history:
+		history.pop_front()
+	index = history.size()
+	set_index(index)
+	%Content.modulate = Color.WHITE
+	if not is_recalling():
+		$Timer.start(DURATION)
+	%Content.show()
+
+func set_index(idx:int):
+	index = clampi(idx, 0, history.size()-1)
+	%TextLabel.text = \"[center]\"+history[index]+\"[/center]\"
+	if chara_history[index] == null:
+		%Chara.text = \"\"
+		%Portrait.texture = default
+	else:
+		%Chara.text = chara_history[index].human_name()
+		%Portrait.texture = chara_history[index].portrait
+
+
+func _on_timer_timeout():
+	if is_auto():
+		pass
+	else:
+		if is_recalling():
+			%Content.show()
+			%Content.modulate = Color.WHITE
+			return
+		var tween = create_tween()
+		tween.set_loops(1)
+		tween.tween_property(%Content, \"modulate\", Color.hex(0xffffff00), 0.3)
+		await tween.finished
+		%Content.hide()
+
+
+func _on_recall_toggled(toggled_on):
+	%Content.visible = toggled_on
+	%Content.modulate = Color.WHITE
+
+func _on_auto_pressed() -> void:
+	$Timer.start(DURATION)
+
+
+func _on_backwards_pressed() -> void:
+	set_index(index-1)
+
+func _on_forwards_pressed() -> void:
+	set_index(index+1)
+"
+
+[node name="Subtitles" type="MarginContainer"]
+custom_minimum_size = Vector2(0, 96)
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+script = SubResource("GDScript_6ng5e")
+
+[node name="Timer" type="Timer" parent="."]
+one_shot = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Recall" type="Button" parent="HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+toggle_mode = true
+text = "Recall..."
+
+[node name="Content" type="HBoxContainer" parent="HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/Content"]
+layout_mode = 2
+alignment = 1
+
+[node name="Backwards" type="Button" parent="HBoxContainer/Content/VBoxContainer"]
+layout_mode = 2
+text = "^^"
+
+[node name="Auto" type="Button" parent="HBoxContainer/Content/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+toggle_mode = true
+text = "Auto"
+
+[node name="Forwards" type="Button" parent="HBoxContainer/Content/VBoxContainer"]
+layout_mode = 2
+text = "vv"
+
+[node name="TextLabel" type="RichTextLabel" parent="HBoxContainer/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+bbcode_enabled = true
+drag_and_drop_selection_enabled = false
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="HBoxContainer/Content"]
+layout_mode = 2
+
+[node name="Portrait" type="TextureRect" parent="HBoxContainer/Content/VBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+texture = ExtResource("1_6pyn4")
+stretch_mode = 5
+
+[node name="Chara" type="Label" parent="HBoxContainer/Content/VBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
+[connection signal="toggled" from="HBoxContainer/Recall" to="." method="_on_recall_toggled"]
+[connection signal="pressed" from="HBoxContainer/Content/VBoxContainer/Backwards" to="." method="_on_backwards_pressed"]
+[connection signal="pressed" from="HBoxContainer/Content/VBoxContainer/Auto" to="." method="_on_auto_pressed"]
+[connection signal="pressed" from="HBoxContainer/Content/VBoxContainer/Forwards" to="." method="_on_forwards_pressed"]

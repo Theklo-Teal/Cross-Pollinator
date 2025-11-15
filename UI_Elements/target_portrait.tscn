@@ -1,0 +1,68 @@
+[gd_scene load_steps=4 format=3 uid="uid://bu6dll7f0obnc"]
+
+[ext_resource type="Texture2D" uid="uid://xqmscqfcrc6p" path="res://Assets/Textures/trollface.png" id="1_ud6rd"]
+
+[sub_resource type="GDScript" id="GDScript_v8clb"]
+script/source = "extends VBoxContainer
+
+var ses_id : int
+var human_name : String
+
+func set_character(chara:Character):
+	name = chara.name
+	human_name = chara.human_name()
+	ses_id = chara.ses_id
+	%Label.text = chara.human_name()
+	%TextureRect.texture = chara.portrait
+	for each in chara.statuses:
+		var icon = Ses.new_perk_ui(each)
+		%Status.add_child(icon)
+
+
+func targeted(indeed:bool):
+	if indeed:
+		%TextureRect.self_modulate = Color.RED
+	else:
+		%TextureRect.self_modulate = Color.WHITE
+"
+
+[sub_resource type="LabelSettings" id="LabelSettings_uuqnv"]
+font_size = 10
+font_color = Color(0, 0, 0, 1)
+outline_size = 2
+outline_color = Color(1, 1, 0, 1)
+
+[node name="Target_Portrait" type="VBoxContainer"]
+offset_right = 100.0
+offset_bottom = 82.0
+size_flags_vertical = 0
+script = SubResource("GDScript_v8clb")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="HBoxContainer"]
+unique_name_in_owner = true
+texture_filter = 2
+custom_minimum_size = Vector2(70, 70)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+texture = ExtResource("1_ud6rd")
+expand_mode = 5
+stretch_mode = 5
+
+[node name="Status" type="VFlowContainer" parent="HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+alignment = 2
+
+[node name="Label" type="Label" parent="."]
+unique_name_in_owner = true
+texture_filter = 2
+layout_mode = 2
+size_flags_vertical = 0
+text = "TROLL"
+label_settings = SubResource("LabelSettings_uuqnv")
+horizontal_alignment = 1
+vertical_alignment = 2

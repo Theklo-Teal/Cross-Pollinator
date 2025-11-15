@@ -1,0 +1,138 @@
+[gd_scene load_steps=2 format=3 uid="uid://d1ywhrys6kuyn"]
+
+[sub_resource type="GDScript" id="GDScript_5ifqb"]
+script/source = "extends VBoxContainer
+
+signal force_end_turn
+
+const target_portrait = preload(\"res://UI_Elements/target_portrait.tscn\")
+
+var pool : Dictionary  # Character.ses_id : Character
+var selected = 0
+
+func _on_action_selected(skill_name:String):
+	for each in %Target_Pool.get_children():
+		each.queue_free()
+	pool.clear()
+	
+	var chara = Ses.curr_unit()
+	var targets : Array[Character] = chara.states[skill_name].get_target_characters(chara, true)
+	targets.sort_custom(Ses.unit_sort_algo)
+	for tgt in targets:
+		var portrait = target_portrait.instantiate()
+		portrait.set_character(tgt)
+		%Target_Pool.add_child(portrait)
+		pool[tgt.ses_id] = tgt
+	
+	select_target(0)  #FIXME For some reason the effect of this is delayed.
+
+
+func select_target(target:int):
+	for each in %Target_Pool.get_children():
+		each.targeted(false)
+	
+	if target == null or %Target_Pool.get_child_count() == 0:
+		%Target_Name.text = \"None\"
+		selected = 0
+	else:
+		var portrait = %Target_Pool.get_child(target)
+		portrait.targeted(true)
+		%Target_Name.text = portrait.human_name
+		selected = target
+
+func select_next():
+	select_target(wrapi(selected + 1, 0, pool.size()))
+func select_prev():
+	select_target(wrapi(selected - 1, 0, pool.size()))
+
+func get_selected_target(idx:int = -1) -> Character:
+	## returns the currently selected target, or optionally the target with the given index in «pool».
+	if %Target_Pool.get_child_count() == 0:
+		return null
+	else:
+		var who = selected
+		if idx >= 0:
+			who = idx
+		return pool.get(%Target_Pool.get_child(who).ses_id, null)
+
+
+func _on_pause_button_pressed() -> void:
+	get_tree().call_group(\"when_paused\", \"_on_game_paused\")
+
+
+func _on_skip_pressed() -> void:
+	force_end_turn.emit()
+
+
+func _new_round():
+	Ses.rounds += 1
+	%Round_Count.text = \"ROUND: \" + str(Ses.rounds)
+	%Enemy_Count.text = \"Enemies: \" + str(Ses.hostile_count)
+"
+
+[node name="Sidebar" type="VBoxContainer" groups=["tactics_each_round"]]
+anchors_preset = 9
+anchor_bottom = 1.0
+grow_vertical = 2
+script = SubResource("GDScript_5ifqb")
+
+[node name="Pause_Button" type="Button" parent="."]
+layout_mode = 2
+text = "Review Briefing"
+
+[node name="Round_Count" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+text = "ROUND: 0
+"
+horizontal_alignment = 3
+
+[node name="Enemy_Count" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Enemies: 0"
+horizontal_alignment = 3
+
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Target_Pool" type="VFlowContainer" parent="ScrollContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+alignment = 1
+
+[node name="previous" type="Button" parent="HBoxContainer"]
+layout_mode = 2
+text = "<"
+
+[node name="Target_Name" type="Label" parent="HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "None"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Next" type="Button" parent="HBoxContainer"]
+layout_mode = 2
+text = ">"
+
+[node name="Undo" type="Button" parent="."]
+layout_mode = 2
+disabled = true
+text = "UNDO"
+
+[node name="Skip" type="Button" parent="."]
+layout_mode = 2
+text = "SKIP TURN"
+
+[connection signal="pressed" from="Pause_Button" to="." method="_on_pause_button_pressed"]
+[connection signal="pressed" from="Skip" to="." method="_on_skip_pressed"]

@@ -1,0 +1,424 @@
+[gd_scene load_steps=14 format=3 uid="uid://4gr1xx145ick"]
+
+[ext_resource type="Texture2D" uid="uid://bfiyhnjiw2ndx" path="res://Assets/Textures/action_atlas_tall.tres" id="1_4rjm5"]
+[ext_resource type="LabelSettings" uid="uid://dy6xw0b8wosoe" path="res://UI_Elements/skill_button_label_settings.tres" id="2_8igol"]
+[ext_resource type="Texture2D" uid="uid://dna6gp1cfwd4l" path="res://Assets/Textures/action_atlas_square.tres" id="3_a7vtr"]
+[ext_resource type="Texture2D" uid="uid://om2oehtjsspw" path="res://Assets/Textures/wojak_feels.png" id="4_mpfev"]
+[ext_resource type="PackedScene" uid="uid://7bgancwesocd" path="res://UI_Elements/expanding_segmented_range.tscn" id="5_gomgq"]
+
+[sub_resource type="GDScript" id="GDScript_a4akp"]
+script/source = "extends HBoxContainer
+
+signal action_select(skill_name:String)
+
+@onready var action_button_group = ButtonGroup.new()
+
+@onready var slots = {
+	Character.K.PRIM: %Primary,
+	Character.K.SECO: %Secondary,
+	Character.K.DEPL: %Deployable,
+	Character.K.RAISE: %Raise_Stance,
+	Character.K.LOWER: %Lower_Stance,
+}
+
+
+func _ready() -> void:
+	action_button_group.allow_unpress = true
+	action_button_group.pressed.connect(action_selected)
+	for each in slots:
+		slots[each].button_group = action_button_group
+	
+	var skill = Ses.actions[\"Walk\"].new()
+	%Skill_Name.text = \"◆  \" + skill.title + \" ◆\"
+	%Skill_Descript.text = skill.description
+
+func _unhandled_key_input(event: InputEvent) -> void:
+	# The zero key is to select the last action.
+	const numbs = [KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9, KEY_0]
+	var letts = {
+		KEY_Q: slots[Character.K.PRIM],
+		KEY_E: slots[Character.K.SECO],
+		KEY_R: slots[Character.K.RAISE],
+		KEY_F: slots[Character.K.LOWER],
+		KEY_G: slots[Character.K.DEPL],
+	}
+	
+	if not event.is_released():
+		if event.keycode in letts:  # Select main actions
+			if not letts[event.keycode].disabled:
+				var val = not letts[event.keycode].button_pressed
+				letts[event.keycode].button_pressed = val
+				if action_button_group.get_pressed_button() == null:  # The ButtonGroup is not emitting the signal when buttons are unpressed for some reason.
+					action_selected(letts[event.keycode])
+		elif event.keycode in numbs:  # Select other actions
+			var key = numbs.find(event.keycode)
+			if key < Ses.curr_unit().bonus_actions.size():
+				var butt = %Skill_List.get_child(key)
+				if not butt == null:
+					var val = not butt.button_pressed
+					butt.button_pressed = val
+					if action_button_group.get_pressed_button() == null:  # The ButtonGroup is not emitting the signal when buttons are unpressed for some reason.
+						action_selected(butt)
+
+
+func get_selected_action() -> String:
+	var butt = action_button_group.get_pressed_button()
+	if butt == null:
+		return \"Walk\"
+	else:
+		return butt.get_meta(\"skill_name\", \"Idle\")
+
+func action_selected(butt:TextureButton):
+	var skill : CharacterAction = Ses.curr_unit().states[\"Walk\"]
+	if butt.button_pressed == true:
+		var skill_name = butt.get_meta(\"skill_name\")
+		skill = Ses.curr_unit().states[skill_name]
+		action_select.emit(skill_name)
+	else:  # No action selected
+		action_select.emit(\"Walk\")
+	
+	%Skill_Name.text = \"◆  \" + skill.title + \" ◆\"
+	%Skill_Descript.text = skill.description
+
+func update_intel(chara: Character):
+	# Get character ID
+	%Chara_Portrait.texture = chara.portrait
+	%Chara_Name.text = chara.human_name()
+	
+	# Get character stats
+	%Stats.text = \"SPD:\" + str(chara.speed) + \" WLL:\" + str(chara.will)
+	%Health.max_value = chara.max_health
+	%Health.value = chara.health
+	%Stamina.max_value = chara.max_stamina
+	%Stamina.value = chara.stamina
+	%Mental.max_value = chara.max_mental
+	%Mental.value = chara.mental
+	
+	# Fill in Character Perks:
+	for each in %Perks.get_children():
+		each.queue_free()
+	
+	for perk in chara.base_perks + chara.added_perks + chara.statuses:
+		var icon = Ses.new_perk_ui(perk)
+		%Perks.add_child(icon)
+	
+	# Fill in the Character Actions
+	for slot in slots:
+		var skill_name = chara.added_actions[slot]
+		Ses.update_action_ui(skill_name, slots[slot])
+		slots[slot].set_meta(\"skill_name\", skill_name)
+		slots[slot].disabled = not skill_name in Ses.actions
+	
+	for each in %Skill_List.get_children():
+		each.queue_free()
+	
+	var skill_idx : int = 1
+	for skill in chara.base_actions + chara.bonus_actions:
+		var butt = Ses.new_action_ui(skill)
+		butt.toggle_mode = true
+		butt.button_group = action_button_group
+		butt.set_meta(\"skill_name\", skill)
+		%Skill_List.add_child(butt)
+		if skill_idx <= 10:
+			var hint = Label.new()
+			if skill_idx == 10:
+				hint.text = str(0)  # Have the last action be selected with the 0 key
+			else:
+				hint.text = str(skill_idx)
+			hint.label_settings = preload(\"res://UI_Elements/skill_button_label_settings.tres\")
+			butt.add_child(hint)
+			hint.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+			skill_idx += 1
+"
+
+[sub_resource type="GDScript" id="GDScript_r140y"]
+script/source = "extends VBoxContainer
+
+
+func _on_skill_name_toggled(toggle: bool) -> void:
+	%Skill_Descript.visible = toggle
+	%Skill_List.visible = not toggle
+"
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_orpaq"]
+content_margin_left = 12.0
+content_margin_top = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(0.26, 0.26, 0.26, 0.588235)
+border_width_left = 6
+border_width_top = 9
+border_width_right = 3
+border_width_bottom = 3
+border_blend = true
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="LabelSettings" id="LabelSettings_dngm4"]
+shadow_size = 3
+shadow_color = Color(0, 0, 0, 0.552941)
+shadow_offset = Vector2(1.5, 1.5)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_r85f8"]
+bg_color = Color(0.805601, 0.443384, 0.399894, 1)
+border_width_left = 2
+border_width_top = 2
+border_color = Color(0.898601, 0.617419, 0.578809, 1)
+border_blend = true
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+shadow_offset = Vector2(2, 2)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wqqyb"]
+bg_color = Color(0.226707, 0.226708, 0.226707, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_bottom = 2
+border_color = Color(0.172833, 0.172833, 0.172833, 1)
+border_blend = true
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fy5ic"]
+bg_color = Color(0.234612, 0.468342, 0.814082, 1)
+border_width_left = 2
+border_width_top = 2
+border_color = Color(0.391938, 0.603855, 0.920857, 1)
+border_blend = true
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_l8m2a"]
+bg_color = Color(0.327711, 0.534267, 0.311813, 1)
+border_width_left = 2
+border_width_top = 2
+border_color = Color(0.408469, 0.647203, 0.389767, 1)
+border_blend = true
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[node name="Character" type="HBoxContainer"]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+alignment = 2
+script = SubResource("GDScript_a4akp")
+
+[node name="Skills2" type="VBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+script = SubResource("GDScript_r140y")
+
+[node name="Skill_Name" type="Button" parent="Skills2"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+toggle_mode = true
+text = "◆ Move ◆"
+
+[node name="Skills" type="PanelContainer" parent="Skills2"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_orpaq")
+
+[node name="Skill_Descript" type="RichTextLabel" parent="Skills2/Skills"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+
+[node name="Skill_List" type="VFlowContainer" parent="Skills2/Skills"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+alignment = 1
+last_wrap_alignment = 1
+reverse_fill = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="Primary" type="TextureButton" parent="VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+toggle_mode = true
+texture_normal = ExtResource("3_a7vtr")
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/Primary"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -36.0
+offset_right = 40.0
+grow_vertical = 0
+text = "Q"
+label_settings = ExtResource("2_8igol")
+vertical_alignment = 1
+
+[node name="Secondary" type="TextureButton" parent="VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+toggle_mode = true
+texture_normal = ExtResource("3_a7vtr")
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/Secondary"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -23.0
+offset_right = 40.0
+grow_vertical = 0
+text = "E"
+label_settings = ExtResource("2_8igol")
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Raise_Stance" type="TextureButton" parent="VBoxContainer/HBoxContainer2/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+toggle_mode = true
+texture_normal = ExtResource("3_a7vtr")
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer2/VBoxContainer/Raise_Stance"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -23.0
+offset_right = 40.0
+grow_vertical = 0
+text = "R"
+label_settings = ExtResource("2_8igol")
+
+[node name="Lower_Stance" type="TextureButton" parent="VBoxContainer/HBoxContainer2/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+toggle_mode = true
+texture_normal = ExtResource("3_a7vtr")
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer2/VBoxContainer/Lower_Stance"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -23.0
+offset_right = 40.0
+grow_vertical = 0
+text = "F"
+label_settings = ExtResource("2_8igol")
+
+[node name="Deployable" type="TextureButton" parent="VBoxContainer/HBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+toggle_mode = true
+texture_normal = ExtResource("1_4rjm5")
+stretch_mode = 3
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer2/Deployable"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -36.0
+offset_right = 40.0
+grow_vertical = 0
+text = "G"
+label_settings = ExtResource("2_8igol")
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Chara_Name" type="Label" parent="VBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Wojak"
+horizontal_alignment = 1
+
+[node name="Chara_Portrait" type="TextureRect" parent="VBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+texture = ExtResource("4_mpfev")
+stretch_mode = 3
+
+[node name="VBoxContainer3" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Stats" type="Label" parent="VBoxContainer3"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "SPD:5 WLL:5"
+horizontal_alignment = 3
+
+[node name="Health" parent="VBoxContainer3" instance=ExtResource("5_gomgq")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 20)
+layout_mode = 2
+color = Color(0, 0, 0, 0)
+text = "    Health"
+max_value = 6
+value = 5
+horizontal_alignment = 0
+label_settings = SubResource("LabelSettings_dngm4")
+segm_spacing = 3
+fill_style = SubResource("StyleBoxFlat_r85f8")
+void_style = SubResource("StyleBoxFlat_wqqyb")
+
+[node name="Stamina" parent="VBoxContainer3" instance=ExtResource("5_gomgq")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 20)
+layout_mode = 2
+color = Color(0, 0, 0, 0)
+text = "    Stamina"
+max_value = 4
+horizontal_alignment = 0
+label_settings = SubResource("LabelSettings_dngm4")
+segm_spacing = 3
+fill_style = SubResource("StyleBoxFlat_fy5ic")
+void_style = SubResource("StyleBoxFlat_wqqyb")
+
+[node name="Mental" parent="VBoxContainer3" instance=ExtResource("5_gomgq")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 20)
+layout_mode = 2
+color = Color(0, 0, 0, 0)
+text = "    Mental"
+max_value = 12
+value = 5
+horizontal_alignment = 0
+label_settings = SubResource("LabelSettings_dngm4")
+segm_spacing = 3
+fill_style = SubResource("StyleBoxFlat_l8m2a")
+void_style = SubResource("StyleBoxFlat_wqqyb")
+
+[node name="Perks" type="HFlowContainer" parent="VBoxContainer3"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[connection signal="toggled" from="Skills2/Skill_Name" to="Skills2" method="_on_skill_name_toggled"]

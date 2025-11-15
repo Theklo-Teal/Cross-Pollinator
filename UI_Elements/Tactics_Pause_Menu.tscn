@@ -1,0 +1,126 @@
+[gd_scene load_steps=3 format=3 uid="uid://dq84n25twu0fv"]
+
+[sub_resource type="GDScript" id="GDScript_hjgqx"]
+resource_name = "Tactics_Pause_Menu"
+script/source = "extends MarginContainer
+
+func _on_close_menu_pressed() -> void:
+	get_tree().call_group(\"when_paused\", \"_on_game_paused\")
+"
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_l13y0"]
+content_margin_left = 22.0
+content_margin_top = 22.0
+content_margin_right = 22.0
+content_margin_bottom = 22.0
+bg_color = Color(0.180005, 0.180005, 0.180005, 1)
+corner_radius_top_left = 32
+corner_radius_bottom_right = 32
+
+[node name="Pause_Menu" type="MarginContainer"]
+offset_left = 22.0
+offset_top = 22.0
+offset_right = 822.0
+offset_bottom = 405.0
+script = SubResource("GDScript_hjgqx")
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_l13y0")
+
+[node name="HSplitContainer" type="HSplitContainer" parent="PanelContainer"]
+layout_mode = 2
+
+[node name="Mission" type="VBoxContainer" parent="PanelContainer/HSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/HSplitContainer/Mission"]
+layout_mode = 2
+
+[node name="close_menu" type="Button" parent="PanelContainer/HSplitContainer/Mission/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Close"
+
+[node name="Spacer" type="Control" parent="PanelContainer/HSplitContainer/Mission/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="PanelContainer/HSplitContainer/Mission/HBoxContainer"]
+layout_mode = 2
+text = "Pause Menu"
+
+[node name="HSeparator" type="HSeparator" parent="PanelContainer/HSplitContainer/Mission"]
+layout_mode = 2
+
+[node name="Mission_Type" type="Label" parent="PanelContainer/HSplitContainer/Mission"]
+layout_mode = 2
+text = "VIP Extraction"
+
+[node name="Mission_Descript" type="RichTextLabel" parent="PanelContainer/HSplitContainer/Mission"]
+layout_mode = 2
+bbcode_enabled = true
+text = "Seigro knows the location of a fellow Agarthian named Eksono Delta, who is being held captive by clandestine cell operatives in rural area. We are to find her and exfiltrate. She isn't expecting to be escorted, so Seigro must be the first person to talk to her."
+fit_content = true
+
+[node name="CheckBox4" type="CheckBox" parent="PanelContainer/HSplitContainer/Mission"]
+layout_mode = 2
+disabled = true
+text = "Eliminate any resistance."
+
+[node name="CheckBox" type="CheckBox" parent="PanelContainer/HSplitContainer/Mission"]
+layout_mode = 2
+disabled = true
+text = "Arrive at the rally point."
+
+[node name="CheckBox2" type="CheckBox" parent="PanelContainer/HSplitContainer/Mission"]
+layout_mode = 2
+disabled = true
+text = "Have Seigro interact with Eksono first."
+
+[node name="CheckBox3" type="CheckBox" parent="PanelContainer/HSplitContainer/Mission"]
+layout_mode = 2
+disabled = true
+text = "Escort Eksono to the extraction point."
+
+[node name="CheckBox5" type="CheckBox" parent="PanelContainer/HSplitContainer/Mission"]
+layout_mode = 2
+disabled = true
+text = "Seigro and Eksono must not run out of health."
+
+[node name="VBoxContainter" type="VBoxContainer" parent="PanelContainer/HSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Settings" type="ScrollContainer" parent="PanelContainer/HSplitContainer/VBoxContainter"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/HSplitContainer/VBoxContainter/Settings"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="PanelContainer/HSplitContainer/VBoxContainter"]
+layout_mode = 2
+text = "Game Saves automatically at the end of the Mission."
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/HSplitContainer/VBoxContainter"]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="PanelContainer/HSplitContainer/VBoxContainter/HBoxContainer"]
+layout_mode = 2
+text = "Revert to Base"
+
+[node name="Spacer" type="Control" parent="PanelContainer/HSplitContainer/VBoxContainter/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Button2" type="Button" parent="PanelContainer/HSplitContainer/VBoxContainter/HBoxContainer"]
+layout_mode = 2
+text = "Quit Game"
+
+[connection signal="pressed" from="PanelContainer/HSplitContainer/Mission/HBoxContainer/close_menu" to="." method="_on_close_menu_pressed"]
