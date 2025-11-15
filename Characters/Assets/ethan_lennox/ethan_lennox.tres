@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="CharacterLore" load_steps=2 format=3 uid="uid://b7r1jdr7qhh1x"]
+
+[ext_resource type="Script" uid="uid://ihbqbn0v1d2f" path="res://Characters/character_lore.gd" id="1_50yne"]
+
+[resource]
+script = ExtResource("1_50yne")
+rank = 4
+faction = "Chevron"
+org_codename = "Dandelion"
+squad_codename = "Ace of Spades"
+bloodtype = "O-"
+sex = "MALE"
+likes = ""
+dislikes = "Clowns"
+hobbies = "Card Games"

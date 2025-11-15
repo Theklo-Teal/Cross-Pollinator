@@ -1,0 +1,53 @@
+[gd_scene load_steps=3 format=3 uid="uid://ceb46jh6fk367"]
+
+[ext_resource type="Texture2D" uid="uid://om2oehtjsspw" path="res://Assets/Textures/wojak_feels.png" id="1_mk8p5"]
+
+[sub_resource type="GDScript" id="GDScript_4w86o"]
+script/source = "extends Sprite3D
+
+## This node is meant to flag the location where to spawn the player team in a MapScenario.
+## This node is meant to be placed as a child of a TacMap where the characters will be associated to.
+
+@export_enum(\"-Z\", \"-X\", \"+Z\", \"+X\") var look_direction : int = 0  ## Where should character look towards once spawned.
+const towards = [Vector3.BACK, Vector3.RIGHT, Vector3.FORWARD, Vector3.LEFT]
+
+func _ready() -> void:
+	position.y = get_parent().position.y
+	hide()
+	
+	await get_parent().ready  # We need the parent TacMap to be ready before we can add children to it.
+	
+	if Ses.start_team.is_empty():
+		# The team wasn't initialized yet, so let's just do it now.
+		for chara_name in Ses.playdata.get_value(\"Unlocked\", \"chara\", [\"ethan_lennox\"]):
+			if Ses.playdata.get_value(chara_name, \"available\", true):
+				var chara : Character = load(\"res://Characters/Tactics/\"+chara_name+\".tscn\").instantiate()
+				Ses.start_team.append(chara)
+	var chara_offset := Vector3.ZERO
+	for chara in Ses.start_team:
+		get_parent().add_child(chara, true)  #FIXME Why is this failing to add the characters?
+		chara.position = position + chara_offset
+		if chara_offset.x + 1 >= 2: # This makes the the characters packed together, rather than in a straight queue.
+			chara_offset.y += 1
+			chara_offset.x = 0 
+		else:
+			chara_offset.x += 1
+		
+		chara.lore.rank = Ses.playdata.get_value(chara.name, \"rank\", [false]).size()
+		var skills = {
+			\"rank\": Ses.playdata.get_value(chara.name, \"rank\", [false]),
+			\"armor\": Ses.playdata.get_value(chara.name, \"armor\", \"\"),
+			\"loadout\": Ses.playdata.get_value(chara.name, \"loadout\", []),
+			}
+		chara.ready_states(skills)
+		chara.look_at(towards[look_direction] + chara.position)
+"
+
+[node name="team_allies_spawn" type="Sprite3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+pixel_size = 0.005
+billboard = 2
+alpha_cut = 1
+alpha_antialiasing_mode = 2
+texture = ExtResource("1_mk8p5")
+script = SubResource("GDScript_4w86o")

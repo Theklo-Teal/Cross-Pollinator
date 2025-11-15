@@ -1,0 +1,62 @@
+[gd_scene load_steps=3 format=3 uid="uid://c7lajfoxowv61"]
+
+[ext_resource type="Texture2D" uid="uid://xqmscqfcrc6p" path="res://Assets/Textures/trollface.png" id="1_4r45t"]
+
+[sub_resource type="GDScript" id="GDScript_4w86o"]
+script/source = "extends Sprite3D
+
+## This node is meant to flag the location where to spawn the CPU controlled characters in a MapScenario.
+## This node is meant to be placed as a child of a TacMap where the characters will be associated to.
+
+@export var spawn_count : int = 2  ## How many characters to spawn.
+@export_enum(\"default\", \"team_hostile\", \"team_friend\", \"team_aggro\", \"team_neutral\") var team : String = \"default\"  ## Force the characters to be of a certain team. Use default if that's undesirable.
+@export var character_names : Array[String]  ## Which characters to spawn. The name of their scene file names, without extension.
+@export var character_ranks : Array[CharacterLore.RANK]  ## The rank of the characters to spawn. Determines which equipment they will have.
+
+func _ready() -> void:
+	position.y = get_parent().position.y
+	hide()
+	await get_parent().ready
+	respawn()
+
+
+func respawn():
+	## Call this function to spawn again!
+	
+	randomize()
+	
+	var where := Vector3.ZERO
+	var row_len : int = ceili(sqrt(spawn_count))  # How many characters to place in a row before changing row, to keep a tight group of character, instead of a queue.
+	
+	# Produce new characters
+	for chara_num in range(spawn_count):
+		var choice = randi_range(0, character_names.size() - 1)
+		var chara : Character = load(\"res://Characters/Tactics/\"+ character_names[choice] +\".tscn\").instantiate()
+		if not team == \"default\":
+			chara.remove_from_group(chara.team)
+			chara.add_to_group(team)
+		get_parent().add_child(chara)
+		chara.position = where + position
+		if where.x + 1 >= row_len:
+			where.x = 0
+			where.z += 1
+		else:
+			where.x += 1
+		
+		chara.lore.rank = character_ranks[choice]
+		var rank : Array[bool]
+		for tier in range(character_ranks[choice]):
+			rank.append( [true,false].pick_random() )
+		var skills = {\"loadout\": [], \"armor\": \"\",
+			\"rank\": rank
+		}
+		chara.ready_states(skills)
+"
+
+[node name="unit_spawner" type="Sprite3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+billboard = 2
+alpha_cut = 1
+alpha_antialiasing_mode = 2
+texture = ExtResource("1_4r45t")
+script = SubResource("GDScript_4w86o")

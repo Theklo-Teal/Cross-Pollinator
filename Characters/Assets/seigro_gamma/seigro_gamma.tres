@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="CharacterLore" load_steps=2 format=3 uid="uid://cowgxwyl2nlfd"]
+
+[ext_resource type="Script" uid="uid://ihbqbn0v1d2f" path="res://Characters/character_lore.gd" id="1_j1x1g"]
+
+[resource]
+script = ExtResource("1_j1x1g")
+rank = 3
+faction = "Chevron"
+org_codename = "Anthracite"
+squad_codename = "Heart Ace"
+bloodtype = "AB-"
+sex = "[AGARTHIAN]"
+likes = "Motorcycles, Heavy Weapons, Concerts"
+dislikes = ""
+hobbies = ""
