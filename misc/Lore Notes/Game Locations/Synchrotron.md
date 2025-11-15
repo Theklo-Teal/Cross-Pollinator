@@ -1,1 +1,0 @@
-A small particle accelerator. Powerful magnetic fields disable a lot of technology.

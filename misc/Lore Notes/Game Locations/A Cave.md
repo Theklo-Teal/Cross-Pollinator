@@ -1,1 +1,0 @@
-A section of tunnel was accidentally drilled into a natural cavern. There are bats. The end of the cavern was collapsed and barricaded.

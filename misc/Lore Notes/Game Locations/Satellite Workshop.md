@@ -1,1 +1,0 @@
-A military space satellite is being constructed here. It seems to carry some insidious weapon.

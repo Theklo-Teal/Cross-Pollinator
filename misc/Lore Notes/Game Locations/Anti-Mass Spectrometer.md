@@ -1,1 +1,0 @@
-A large device capable of scanning exotic technology.

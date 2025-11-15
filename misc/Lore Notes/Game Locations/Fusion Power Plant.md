@@ -1,1 +1,0 @@
-The electrical generator for much of the underground network. While nuclear fusion breakthrough is always 20 years in the future for civilians, the secret military has already been using it for 20 years.

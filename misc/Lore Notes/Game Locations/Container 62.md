@@ -1,1 +1,0 @@
-Where Seigro is first found

@@ -1,1 +1,0 @@
-A flooded area that can only be traversed with diving equipment.
