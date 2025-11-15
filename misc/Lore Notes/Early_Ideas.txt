@@ -1,0 +1,143 @@
+XCOM style tactical turn based combat. A more free-roam and zoomed-in variation on the tactical perspective is used to explore the Headquarters, meet its characters and manage its resources. 
+There's a playing card theme with the interface and how characters identify each other. For example, each character has a playing card suit as a codename.
+The game is firstly of military thriller aesthetic, cold and straight-edge, distinguishing it from the typical gawking porn game.
+Only when characters have sex with each other do they reveal a softer and warm perspective to sex.
+The game is also sensual in undertones of the sci-fi aspects and the character subtleties. Alien machinery is sexual, and this sex, in the way it affects emotions is contextualized as highly utilitarian.
+Sex with alien machinery is very Cronenberg-esque, and it is advertised as such by their soft HR Giger inspired designs.
+
+Each update has a special name. Sort of like story chapter names.
+
+One 3D unit = 1 Meter = 200 pixels at 0.005 m/px
+
+
+Clandestine military group is formed after the discovery of an ultra-terrestrial advanced race of Amazonian-like warriors (Vril from Agartha).
+This was accomplished thanks to a device off-shoot of gravity wave detectors, which is codenamed Cross Polinator, enabling teleportation based on matter-energy phase differences.
+The Cross Polinator has similar effects to the secret device used in the Philadelphia Experiment.
+One objective of the game is to defend Agartha from an invading rival organization with intentions to colonize. The Chevron Detachment also needs to defend its own base from the rival incursions.
+Motto: "Under Reasonable Doubt"
+
+There is an SCP-like theme, where exotic artifacts and characters need to be retrieved or escorted for some missions.
+Maybe some Twilight Zone feel to story arcs?
+Mission ideas:
+	- New locations discovered: drones need to be built to access them. They could be plane, tank or decoy exosuit.
+
+Use "Fabricator Customization" for a "build-your-own Agarthian".  The character can then appear as background of some cutscenes.
+
+There following are character classes available:
+	Saboteaur: Ethan Lennox, human spec op soldier capable of planting remote explosives, breaching charges and landmines.
+	Technician: Sven Moller, Support specialist and hacker, capable of modifying the environment to provide harzards or disable security. Can deploy tank drone.
+	Pilot: A Vril warrior riding an exosuit, capable of taking huge damage.
+	Shaman: Vril warrior with psionic abilities who can wear the "wraith suit" to be invisible and pass through walls.
+
+Different models of Vril Exosuit have codenames starting with the letter S:
+	Sapphire
+	Salt
+	Strider
+	Stalward
+	Stainless
+	Strident
+	Stilts
+	Sovereign
+	etc.
+
+Technitian drone models have codenames starting with the letter D:
+	Decoy
+	Deterrent
+	Defender
+	Dynamic
+	Dynamo
+	Decal
+	Deuterium
+	Delron
+	Duraloy
+	etc.
+
+
+Enemy Alien Ideas:
+	- Battle LA "Grafted Weapons"
+	- Xenomorph/Replicator stand in
+	- Goa'uld symbiotes as infiltrators
+	- "Tech Cocoons", Cyberdisc/Gatekeeper
+	- "District 9 Prawns", users of smart guns
+
+
+Control Elements:
+	- Undo action button
+	- Actions common to most characters are to be mapped to the same number key.
+	- Primary Weapon and Secondary Weapon have their own number key.
+	- Tab selects character and target.
+	- Camera rotates like a turn table and rises or lowers in height.
+	- Camera altitude and selected altitude for character movement are controlled independently.
+
+Gameplay Elements:
+	- Allow multiple faction skirmishes. One player controls one faction, but the others which are AI controlled fight mutually as well as the player faction.
+	- Enemies can have reinforcements, spawning more squads, once the first one is defeated.
+	- Enemies all take action of their turn at the same time.
+	- Have a sort of rock-paper-scissors mechanic with actions and perks. For example, an explosive weapon is more effective against characters of "Robotic" perk, buth that perk is resistant against poison weapons.
+	- There is no reload action. Characters reload their weapons as a fluff animation.
+	- Passive Abilities vary depending on weapons carried.
+	- Characters normally walk according to grid tiles. But when sprinting, they can go in straight lines, while avoiding obstacles.
+	- Characters are stealthy in similar way to XCOM2, but the Shaman character can stay stealthy independently as long as not directly spotted.
+	- Any unit will enter Overwatch automatically after ending their turn without attacking.
+	- Shooting on uncovered targets always have 100% chance of hit, but RNG is used to decide damage between "regular", "grazing" and "critical".
+	- Character miss their intended target by hitting cover objects.
+	- Certain cover objects are environmental hazards are will explode if demaged.
+
+
+Abilities and Actions:
+	- Ray Gun:
+		- Knock Out
+		- Kill if Knocked Out
+		- Vaporize Bodies that were knocked out or killed
+	- Pistol:
+		- Quick Draw (can be used after primary weapon with no action cost)
+		- Silent Shot (allows attack without failing stealth)
+	- Submachinegun:
+		- Double Tap (Can fire another attempt after firing once without consuming action points)
+	- Chaingun:
+		- Suppress (alternative to Overwatch, Lowers hit chance of a target when firing others)
+	- Battle Rifle:
+		-Flush Out (Destroys cover around target. Target flees to another position)
+	- Assault Rifle:
+		- Run and Gun (Movement doesn't consume action points)
+	- Sniper Rifle:
+		- Headshot (Higher change of critical hit)
+		- Disabling Shot (disables primary weapon of a target)
+	- Rocket Launcher:
+		- Homing Shot (rocket ignores range or stealth, always hitting a Painted Target)
+	- Deployables:
+		- Frag Grenade
+		- Smoke Grenade
+		- Flash Grenade
+		- Poison Grenade
+		- Stimulant Grenade
+	- Support:
+		- Taunt (increases change an enemy will target the selected character rather than more obvious allies)
+		- Repair (raises the health of a damaged robot)
+		- Lay Mine (explosive not detectable by enemies that explode when stepped on)
+		- Remote Explosive (First Activation places explosive, second activation detonates it)
+		- Climbing Rope (creates a valid path between two tiles at different altitudes)
+		- Target Painting (Increases hit chance on other characters shooting the target)
+		- Lightning Reflexes (Immune to Overwatch)
+		- Melee Counter (An adjecent enemy that attacks is automatically attacked)
+		- Reaction Shot (Attacks any enemy passing or settling an adjacent tile)
+	- Psionics:
+		- Heal (raises health points on a hurt ally)
+		- Mindblast (like the head explosions in the movie Scanners)
+		- Telekinetic Defense (Immunity to projectile damage)
+		- Terror (Induces Panic)
+		- Telepathy (Lower hit chance of a target when shooting others)
+
+Status Effects:
+	- Panicking
+	- Mind Controlled
+	- Wet
+	- Bloodied
+	- Burning
+	- Unconscious
+	- Weapon Disabled
+	- Blind (Enemies return to stealth and leave attack range)
+	
+	
+Sex Gameplay:
+	- Rhythm based sex scenes. If the timing of thrusts is correct, the speed/intensity increases until the orgasm threshold.
