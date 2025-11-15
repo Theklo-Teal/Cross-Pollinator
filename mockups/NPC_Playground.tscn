@@ -1,0 +1,373 @@
+[gd_scene load_steps=6 format=3 uid="uid://buihc21j3nec2"]
+
+[sub_resource type="GDScript" id="GDScript_qgnu8"]
+script/source = "extends Control
+
+
+func _on_pause_toggled(toggled_on:  bool) -> void:
+	%clear.disabled = toggled_on
+	%pause.text = [\"Paused\", \"Running\"][int(toggled_on)]
+	if toggled_on:
+		%ColorRect.start()
+	else:
+		%ColorRect.stop()
+"
+
+[sub_resource type="GDScript" id="GDScript_e7w4d"]
+script/source = "extends ColorRect
+
+## A field to test artificial intelligence things for character behavior.
+
+const TICK_RATE = 0.5
+
+# How many cells in the field
+const WIDE = 30
+const TALL = 20
+
+# Colors of tiles
+const EMPTY_C := Color(0.5, 0.5, 0.5, 1.0)
+const BARRIER := Color(0.179, 0.39, 0.26, 1.0)
+const ATTACKR := Color(0.6, 0.321, 0.042, 1.0)
+const DEFENDR := Color(0.202, 0.379, 0.53, 1.0)
+const VISUAL := Color(1.0, 1.0, 0.514, 1.0)
+
+var max_score : float  # The maximum utility score of currently deciding character.
+
+var defender : Array[Vector2i]
+var attacker : Array[Vector2i]  # Initial position of attacking NPCs
+var run_attacker : Array[Vector2i]  # position updates on attacker NPCs
+
+var terrain : Array[Vector2i]
+var viz : Dictionary[Vector2i, float]  # What to highlight and with what intensity
+
+ # Where barriers are
+var navigat : AStarGrid2D  # Navigation grid with just obstacles
+var nav : AStarGrid2D # including NPCs
+
+func _ready() -> void:
+	navigat = generate_nav(terrain)
+	nav = generate_nav(terrain + attacker)
+	
+	var initial = \"\"\"
+	(27, 9)
+	(4, 3), (8, 9), (5, 13)
+	(3, 5), (4, 5), (5, 5), (6, 5), (6, 4), (6, 3), (6, 2), (5, 1), (4, 1), (3, 1), (2, 1), (1, 1), (1, 2), (10, 3), (10, 4), (10, 5), (10, 6), (10, 7), (10, 8), (10, 9), (10, 10), (10, 11), (13, 10), (13, 11), (13, 12), (13, 13), (13, 14), (13, 15), (14, 6), (15, 6), (15, 5), (14, 5), (19, 3), (19, 4), (19, 13), (17, 10)
+	\"\"\"
+	var n = 0
+	var package : Array[Vector2i]
+	initial = initial.strip_edges()
+	for line : String in initial.split(\"\\n\", false):
+		package.clear()
+		line = line.strip_edges()
+		line = line.substr(1, line.length() - 2)
+		for vec : String in line.split(\"), (\"):
+			var num = vec.split(\", \")
+			package.append(Vector2i(num[0].to_int(), num[1].to_int()))
+		match n:
+			0:
+				defender = package.duplicate()
+			1:
+				attacker = package.duplicate()
+				run_attacker = package.duplicate()
+			2:
+				terrain = package.duplicate()
+		n += 1
+
+func generate_nav(obstacles:Array[Vector2i]) -> AStarGrid2D:
+	var nav_grid = AStarGrid2D.new()
+	nav_grid.default_compute_heuristic = AStarGrid2D.HEURISTIC_OCTILE
+	nav_grid.default_estimate_heuristic = AStarGrid2D.HEURISTIC_OCTILE
+	nav_grid.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_AT_LEAST_ONE_WALKABLE
+	nav_grid.region = Rect2i(Vector2i.ZERO, Vector2i(WIDE, TALL))
+	nav_grid.update()
+	for cell in obstacles:
+		nav_grid.set_point_solid(cell, true)
+	return nav_grid
+
+func update_nav(nav_grid:AStarGrid2D, obstacles:Array[Vector2i]):
+	nav_grid.clear()
+	nav_grid.region = Rect2i(Vector2i.ZERO, Vector2i(WIDE, TALL))
+	nav_grid.update()
+	for cell in obstacles:
+		nav_grid.set_point_solid(cell, true)
+
+func start():
+	update_nav(navigat, terrain)
+	update_nav(nav, terrain + attacker)
+	run_attacker = attacker.duplicate()
+	animate = true
+
+func stop():
+	run_attacker = attacker.duplicate()
+	animate = false
+	queue_redraw()
+
+var active : int
+var animate : bool
+var wait : float
+var half : bool
+var next : Vector2i
+func _process(delta: float) -> void:
+	if animate:
+		if wait >= TICK_RATE:
+			wait = 0
+			half = false
+			run_attacker[active] = next
+			active = (active + 1) % run_attacker.size()
+			update_nav(nav, terrain + run_attacker)
+			queue_redraw()
+			viz.clear()
+		elif wait >= TICK_RATE * 0.3 and not half:
+			half = true
+			next = $attacker.update(active)
+			queue_redraw()
+		else:
+			wait += delta
+
+var is_drag_barrier : bool
+func _gui_input(event: InputEvent) -> void:
+	if animate:
+		return
+	
+	if event is InputEventMouseButton:
+		if event.is_pressed():
+			if event.button_index == MOUSE_BUTTON_RIGHT:
+				is_drag_barrier = true
+				var cell = get_cell(event.position)
+				if Input.is_key_pressed(KEY_CTRL):
+					terrain.erase(cell)
+				elif not cell in terrain:
+					if not cell in attacker and not cell in defender:
+						terrain.append(cell)
+		else:
+			is_drag_barrier = false
+	if event is InputEventMouseMotion and is_drag_barrier:
+		var cell = get_cell(event.position)
+		if Input.is_key_pressed(KEY_CTRL):
+			terrain.erase(cell)
+		elif not cell in terrain:
+			if not cell in attacker and not cell in defender:
+				terrain.append(cell)
+	
+	if event is InputEventMouseButton and not event.pressed:
+		if not get_cell(event.position) in terrain:
+			if event.button_index == MOUSE_BUTTON_LEFT:
+				var cell = get_cell(event.position)
+				if Input.is_key_pressed(KEY_CTRL):
+					attacker.erase(cell)
+				elif not cell in attacker:
+					attacker.append(cell)
+				run_attacker = attacker
+					
+			if event.button_index == MOUSE_BUTTON_MIDDLE:
+				var cell = get_cell(event.position)
+				defender[0] = cell
+	
+	queue_redraw()
+
+func _draw():
+	var cell_size = size.y / TALL
+	custom_minimum_size.x = WIDE * cell_size
+	
+	for y in range(TALL):
+		for x in range(WIDE):
+			var cell = Vector2i(x,y)
+			var coord = get_coord(cell)
+			var rect = Rect2(
+					coord + Vector2(2,2),
+					Vector2.ONE * cell_size - Vector2(4,4)
+				)
+			if cell in terrain:
+				draw_rect(rect, BARRIER)
+			elif cell in defender:
+				draw_rect(rect, DEFENDR)
+			elif cell in run_attacker:
+				draw_rect(rect, ATTACKR)
+			elif cell in viz:
+				var intensity = 1 - inverse_lerp(0, max_score, viz[cell])
+				draw_rect(rect, VISUAL.darkened(intensity))
+			else:
+				draw_rect(rect, EMPTY_C)
+
+
+## What's the cell on the grid, given a screen coordinate on this ColorRect?
+func get_cell(coord:Vector2) -> Vector2i:
+	return Vector2i(
+		remap(coord.x, 0, size.x, 0, WIDE),
+		remap(coord.y, 0, size.y, 0, TALL)
+		)
+## What's the screen coordinate given the cell on the grid
+func get_coord(cell:Vector2i) -> Vector2:
+	return Vector2(
+		remap(cell.x, 0, WIDE, 0, size.x),
+		remap(cell.y, 0, TALL, 0, size.y)
+		)
+
+
+func _on_clear_pressed() -> void:
+	terrain.clear()
+	queue_redraw()
+
+
+func _on_printer_pressed() -> void:
+	print(defender)
+	print(attacker)
+	print(terrain)
+
+
+func _on_clear_2_pressed() -> void:
+	viz.clear()
+	queue_redraw()
+"
+
+[sub_resource type="GDScript" id="GDScript_jrce8"]
+script/source = "extends Node
+
+const RANGE = 5
+
+@export var walk_util : Curve  # The utility score of moving farther each turn.
+@export var prox_util : Curve  # The utility score of proximity with a target.
+
+func in_terrain_bounds(coord:Vector2) -> bool:
+	if coord.x < 0 or coord.y < 0:
+		return false
+	if coord.x > get_parent().WIDE or coord.y > get_parent().TALL:
+		return false
+	return true
+
+func update(id:int) -> Vector2i:
+	var nav = get_parent().nav
+	var tgt = get_parent().defender[0]
+	var ori = get_parent().run_attacker[id]
+	var separation = nav.get_id_path(ori, tgt).size()  # How far would be for character to walk up to target
+	
+	var scores : Dictionary[Vector2i, float] = {ori: 0.0, }  # The utility score of each relevant cell.
+	
+	for tile in find_spots(ori):  # Find contours to the obstacles
+		var walk_distance = nav.get_id_path(ori, tile).size()
+		if walk_distance <= RANGE: # Filter for tiles within walking distance.
+			# Get the score for distance the character has to travel
+			scores[tile] = walk_util.sample_baked(walk_distance / RANGE)
+			# Get score for the proximity to the enemy
+			var proximity = nav.get_id_path(tile, tgt).size()
+			scores[tile] += prox_util.sample_baked(proximity / separation)
+	
+	get_parent().viz = scores  # Highlight tiles considered in decisions.
+	
+	# List the tiles with most utility.
+	var top_most : Array[Vector2i] = [ori, ]
+	for tile in scores:
+		var reset_top_most : bool = false
+		var util = scores[tile]
+		for each in top_most:
+			if util > scores[each]:
+				reset_top_most = true
+				break
+			elif is_equal_approx(util, scores[each]):
+				top_most.append(util)
+		if reset_top_most:
+			top_most.clear()
+			top_most.append(tile)
+			get_parent().max_score = util
+	
+	# Multiple tiles may have a similar utility score to the highest score found.
+	# Pick one of these at random to introduce some unpredictability to the character decisions.
+	return top_most.pick_random()
+	
+
+
+func find_spots(center:Vector2i) -> Array[Vector2i]:
+	var circle = Math.circle_on_grid(center, RANGE)  # Find all tiles in range
+	var contour : Array[Vector2i]
+	
+	var obstacles_in_circle : Array[Vector2i]
+	var adjacents : Array[Vector2i]
+	
+	# Find all obstacles in range
+	for tile in circle:
+		if tile in get_parent().terrain:
+			obstacles_in_circle.append(tile)
+	
+	# Find all adjacent tiles to each obstacle
+	# NOTE: adjacents could fall out of the circle, but the character should
+	# check walking distance to each tile according to pathfinding anyway, which
+	# would eliminate these overreaching adjacents anyway.
+	for tile in obstacles_in_circle:
+		for adj in Math.adjacent_cells(tile, 0, false):
+			if adj in adjacents:
+				continue
+			adjacents.append(adj)
+	
+	# Select those adjacents that aren't obstacles.
+	for tile in adjacents:
+		if not tile in get_parent().terrain:
+			contour.append(tile)
+		
+	return contour
+"
+
+[sub_resource type="Curve" id="Curve_e7w4d"]
+bake_resolution = 20
+_data = [Vector2(0, 0.5008532), 0.0, 3.930461, 0, 0, Vector2(0.24096385, 1), 0.0, 0.0, 0, 0, Vector2(1, 0.19027305), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="Curve" id="Curve_qgnu8"]
+bake_resolution = 20
+_data = [Vector2(0, 0.51194537), 0.0, 0.0, 0, 0, Vector2(1, 0.47866893), -3.4503508, 0.0, 0, 0]
+point_count = 2
+
+[node name="NpcPlayground" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = SubResource("GDScript_qgnu8")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer"]
+layout_mode = 2
+
+[node name="pause" type="Button" parent="HBoxContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+toggle_mode = true
+text = "Paused"
+
+[node name="clear" type="Button" parent="HBoxContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Clear Terrain"
+
+[node name="clear2" type="Button" parent="HBoxContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Clear Decision"
+
+[node name="printer" type="Button" parent="HBoxContainer/VBoxContainer"]
+layout_mode = 2
+text = "Print Coords"
+
+[node name="ColorRect" type="ColorRect" parent="HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+color = Color(0.21230483, 0.21230483, 0.21230483, 1)
+script = SubResource("GDScript_e7w4d")
+
+[node name="attacker" type="Node" parent="HBoxContainer/ColorRect"]
+script = SubResource("GDScript_jrce8")
+walk_util = SubResource("Curve_e7w4d")
+prox_util = SubResource("Curve_qgnu8")
+
+[connection signal="toggled" from="HBoxContainer/VBoxContainer/pause" to="." method="_on_pause_toggled"]
+[connection signal="pressed" from="HBoxContainer/VBoxContainer/clear" to="HBoxContainer/ColorRect" method="_on_clear_pressed"]
+[connection signal="pressed" from="HBoxContainer/VBoxContainer/clear2" to="HBoxContainer/ColorRect" method="_on_clear_2_pressed"]
+[connection signal="pressed" from="HBoxContainer/VBoxContainer/printer" to="HBoxContainer/ColorRect" method="_on_printer_pressed"]

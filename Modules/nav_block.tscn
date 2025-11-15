@@ -1,0 +1,51 @@
+[gd_scene load_steps=2 format=3 uid="uid://dvqg56mjl56f0"]
+
+[sub_resource type="GDScript" id="GDScript_fwpld"]
+script/source = "@tool
+extends Node3D
+
+## Areas of the Tactical Battle Grid where characters shouldn't go, because there are walls or whatever.
+
+const gridcell_texture = preload(\"res://Assets/Textures/grid_tile.png\")
+var tiles : Array[Vector2i]
+
+@export var reach := Vector2i(1,1) : set = set_reach  ## How many cells the grid has.
+@export var altitude : int : set = set_altitude  ## Which of the Ses.grid objects this relates to.
+
+func set_reach(val:Vector2i):
+	if val.length_squared() < 1:
+		val  = Vector2i(1,1)
+	reach = val
+	
+	# Clear the existing grid gizmo
+	tiles.clear()
+	for each in get_children():
+		each.queue_free()
+	
+	# Draw the new grid gizmo
+	for x in range(reach.x):
+		for y in range(reach.y):
+			var tile = Sprite3D.new()
+			tile.texture = gridcell_texture
+			tile.modulate = Color.RED
+			tile.pixel_size = 0.005
+			tile.axis = Vector3.AXIS_Y
+			tile.no_depth_test = true
+			tile.position = Vector3(x, 0, y)
+			tiles.append(Vector2i(x,y))
+			add_child(tile)
+
+func set_altitude(val:int):
+	altitude = val
+	position.y = altitude + 0.3
+
+
+func is_blocking(cell:Vector2i) -> bool:
+	var offset = Vector2i(Vector2( position.x, position.z).snapped(Vector2i.ONE))
+	cell -= offset
+	return cell in tiles
+"
+
+[node name="NavBlock" type="Node3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+script = SubResource("GDScript_fwpld")

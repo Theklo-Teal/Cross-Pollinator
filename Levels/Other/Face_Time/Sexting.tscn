@@ -1,0 +1,406 @@
+[gd_scene load_steps=16 format=3 uid="uid://dnnp8snln7fyu"]
+
+[ext_resource type="Script" uid="uid://b6mimrfl1yj8c" path="res://Levels/Other/Face_Time/Sexting.gd" id="1_5biqp"]
+[ext_resource type="Texture2D" uid="uid://dp8aqbv0w0sog" path="res://Assets/Textures/Rate_Meter_Overlay.png" id="2_dyabi"]
+[ext_resource type="Texture2D" uid="uid://b5msff7pm2l5u" path="res://Assets/Textures/Rate_Meter_Progress.png" id="3_4bong"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_k3r3x"]
+transparency = 1
+albedo_color = Color(0.854902, 0.403922, 0.388235, 0.317647)
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_x2wgr"]
+
+[sub_resource type="ButtonGroup" id="ButtonGroup_3gcg7"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_n6qy1"]
+font_size = 12
+
+[sub_resource type="LabelSettings" id="LabelSettings_lcwou"]
+font_size = 28
+
+[sub_resource type="Gradient" id="Gradient_txpdo"]
+offsets = PackedFloat32Array(0.217391, 1)
+colors = PackedColorArray(0.44, 0.44, 0.44, 1, 0.66, 0.66, 0.66, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_72spc"]
+gradient = SubResource("Gradient_txpdo")
+width = 50
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_qnlqt"]
+texture = SubResource("GradientTexture1D_72spc")
+modulate_color = Color(0.1065, 0.71, 0.40825, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_h35wa"]
+gradient = SubResource("Gradient_txpdo")
+width = 50
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_8cldt"]
+texture = SubResource("GradientTexture1D_h35wa")
+modulate_color = Color(0.760784, 0.905882, 0.196078, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_c2bjl"]
+gradient = SubResource("Gradient_txpdo")
+width = 50
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_nlte4"]
+texture = SubResource("GradientTexture1D_c2bjl")
+modulate_color = Color(0.735743, 0.124958, 0.514836, 1)
+
+[node name="Dating" type="Node"]
+script = ExtResource("1_5biqp")
+
+[node name="Node3D" type="Node3D" parent="."]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Node3D"]
+transform = Transform3D(0.526882, -0.456509, 0.716935, -8.84856e-09, 0.843513, 0.537108, -0.849939, -0.282993, 0.444432, 0, 2.9975, 0)
+
+[node name="Camera3D" type="Camera3D" parent="Node3D"]
+transform = Transform3D(1, 0, 0, 0, 0.971636, 0.236482, 0, -0.236482, 0.971636, 0, 1.64276, 2.28215)
+fov = 60.0
+
+[node name="Hand" type="CSGSphere3D" parent="Node3D"]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.20277, 1.14355)
+use_collision = true
+collision_layer = 0
+radius = 0.05
+radial_segments = 4
+rings = 3
+material = SubResource("StandardMaterial3D_k3r3x")
+
+[node name="Ray" type="RayCast3D" parent="Node3D"]
+unique_name_in_owner = true
+
+[node name="Character_Body" type="Node3D" parent="Node3D"]
+unique_name_in_owner = true
+
+[node name="Torso" type="CSGCylinder3D" parent="Node3D/Character_Body"]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.519533, 0)
+use_collision = true
+collision_mask = 0
+height = 1.0
+
+[node name="Breast" type="RigidBody3D" parent="Node3D/Character_Body/Torso"]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.546234, -3.0598e-08)
+mass = 3.0
+
+[node name="Breast" type="CSGSphere3D" parent="Node3D/Character_Body/Torso/Breast"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0)
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D/Character_Body/Torso/Breast"]
+shape = SubResource("SphereShape3D_x2wgr")
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Action_Catalogue" type="VBoxContainer" parent="Control"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 209.0
+grow_vertical = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Control/Action_Catalogue"]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="Label" type="Label" parent="Control/Action_Catalogue/HBoxContainer"]
+layout_mode = 2
+text = "ACTION
+FOCUS"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="Focus" type="VBoxContainer" parent="Control/Action_Catalogue/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Partner" type="Button" parent="Control/Action_Catalogue/HBoxContainer/Focus"]
+layout_mode = 2
+toggle_mode = true
+button_group = SubResource("ButtonGroup_3gcg7")
+text = "Seibra"
+
+[node name="Myself" type="Button" parent="Control/Action_Catalogue/HBoxContainer/Focus"]
+layout_mode = 2
+toggle_mode = true
+button_pressed = true
+button_group = SubResource("ButtonGroup_3gcg7")
+text = "Myself"
+
+[node name="Notification" type="Label" parent="Control/Action_Catalogue"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Partner wants that again.
+Partner wants your hand.
+Partner want more vigor."
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Spacer2" type="Control" parent="Control/Action_Catalogue"]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+
+[node name="Action_Cards" type="ScrollContainer" parent="Control/Action_Catalogue"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Partner_Cards" type="VBoxContainer" parent="Control/Action_Catalogue/Action_Cards"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Myself_Cards" type="VBoxContainer" parent="Control/Action_Catalogue/Action_Cards"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Card2" type="HBoxContainer" parent="Control/Action_Catalogue/Action_Cards/Myself_Cards"]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="Control/Action_Catalogue/Action_Cards/Myself_Cards/Card2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Mouth to Thigh
+[Vigorous]"
+
+[node name="ColorRect" type="ColorRect" parent="Control/Action_Catalogue/Action_Cards/Myself_Cards/Card2"]
+custom_minimum_size = Vector2(30, 0)
+layout_mode = 2
+tooltip_text = " (+ Love) This card makes your partner want you more."
+color = Color(0.733333, 0.67451, 0.133333, 1)
+
+[node name="Card1" type="HBoxContainer" parent="Control/Action_Catalogue/Action_Cards/Myself_Cards"]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="Control/Action_Catalogue/Action_Cards/Myself_Cards/Card1"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Penis to Vagina 
+[Softly]"
+
+[node name="ColorRect" type="ColorRect" parent="Control/Action_Catalogue/Action_Cards/Myself_Cards/Card1"]
+custom_minimum_size = Vector2(30, 0)
+layout_mode = 2
+tooltip_text = "(- Lust) This card helps your partner want more from you."
+color = Color(0.738346, 0.0816187, 0.551945, 1)
+
+[node name="Card3" type="HBoxContainer" parent="Control/Action_Catalogue/Action_Cards/Myself_Cards"]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="Control/Action_Catalogue/Action_Cards/Myself_Cards/Card3"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Hand to Clitoris
+[Softly]"
+
+[node name="ColorRect" type="ColorRect" parent="Control/Action_Catalogue/Action_Cards/Myself_Cards/Card3"]
+custom_minimum_size = Vector2(30, 0)
+layout_mode = 2
+tooltip_text = "(+Fun) This card raises how excited your partner is with you."
+color = Color(0.175736, 0.50825, 0.25642, 1)
+
+[node name="Card4" type="HBoxContainer" parent="Control/Action_Catalogue/Action_Cards/Myself_Cards"]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="Control/Action_Catalogue/Action_Cards/Myself_Cards/Card4"]
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "Remove one card and draw a replacement. Removed card has a chance of returning."
+text = "Bury Card"
+
+[node name="ColorRect" type="ColorRect" parent="Control/Action_Catalogue/Action_Cards/Myself_Cards/Card4"]
+custom_minimum_size = Vector2(30, 0)
+layout_mode = 2
+color = Color(0.2, 0.2, 0.2, 1)
+
+[node name="Card6" type="HBoxContainer" parent="Control/Action_Catalogue/Action_Cards/Myself_Cards"]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="Control/Action_Catalogue/Action_Cards/Myself_Cards/Card6"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Turn on Vibrator
+[Vigorous]"
+
+[node name="ColorRect" type="ColorRect" parent="Control/Action_Catalogue/Action_Cards/Myself_Cards/Card6"]
+custom_minimum_size = Vector2(30, 0)
+layout_mode = 2
+tooltip_text = "(-Fun) This card raises how excited your partner is with you. "
+color = Color(0.175736, 0.50825, 0.25642, 1)
+
+[node name="Card5" type="HBoxContainer" parent="Control/Action_Catalogue/Action_Cards/Myself_Cards"]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="Control/Action_Catalogue/Action_Cards/Myself_Cards/Card5"]
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "Allow a card to stay in the hand after being played."
+text = "Persist Card"
+
+[node name="ColorRect" type="ColorRect" parent="Control/Action_Catalogue/Action_Cards/Myself_Cards/Card5"]
+custom_minimum_size = Vector2(30, 0)
+layout_mode = 2
+color = Color(0.2, 0.2, 0.2, 1)
+
+[node name="HSeparator" type="HSeparator" parent="Control/Action_Catalogue"]
+layout_mode = 2
+
+[node name="Card_Handling" type="HBoxContainer" parent="Control/Action_Catalogue"]
+layout_mode = 2
+alignment = 1
+
+[node name="Button" type="Button" parent="Control/Action_Catalogue/Card_Handling"]
+layout_mode = 2
+text = "Buy Card"
+
+[node name="Button2" type="Button" parent="Control/Action_Catalogue/Card_Handling"]
+layout_mode = 2
+text = "Redraw Hand"
+
+[node name="Spacer" type="Control" parent="Control/Action_Catalogue"]
+custom_minimum_size = Vector2(0, 140)
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="Control"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -167.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="Pacing" type="HBoxContainer" parent="Control/MarginContainer"]
+layout_mode = 2
+alignment = 2
+
+[node name="TextureProgressBar" type="TextureProgressBar" parent="Control/MarginContainer/Pacing"]
+layout_mode = 2
+size_flags_vertical = 8
+value = 50.0
+fill_mode = 5
+texture_over = ExtResource("2_dyabi")
+texture_progress = ExtResource("3_4bong")
+radial_initial_angle = 90.0
+radial_fill_degrees = 270.0
+
+[node name="Progress" type="VBoxContainer" parent="Control/MarginContainer/Pacing"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 2
+
+[node name="Label" type="Label" parent="Control/MarginContainer/Pacing/Progress"]
+layout_mode = 2
+text = "CLIMAX"
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="ProgressBar" type="ProgressBar" parent="Control/MarginContainer/Pacing/Progress"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+size_flags_horizontal = 3
+value = 32.0
+
+[node name="VSeparator" type="VSeparator" parent="Control/MarginContainer/Pacing"]
+layout_mode = 2
+
+[node name="Performance" type="VBoxContainer" parent="Control/MarginContainer/Pacing"]
+layout_mode = 2
+alignment = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Control/MarginContainer/Pacing/Performance"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Control/MarginContainer/Pacing/Performance/HBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 1
+text = "Partner's 
+Experience: "
+label_settings = SubResource("LabelSettings_n6qy1")
+horizontal_alignment = 2
+vertical_alignment = 2
+
+[node name="Label3" type="Label" parent="Control/MarginContainer/Pacing/Performance/HBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 1
+text = "Seibra Gamma"
+label_settings = SubResource("LabelSettings_lcwou")
+vertical_alignment = 2
+
+[node name="GridContainer" type="GridContainer" parent="Control/MarginContainer/Pacing/Performance"]
+layout_mode = 2
+columns = 2
+
+[node name="Label" type="Label" parent="Control/MarginContainer/Pacing/Performance/GridContainer"]
+layout_mode = 2
+size_flags_vertical = 5
+tooltip_text = "Enjoyment in the current action."
+mouse_filter = 1
+text = "Fun: "
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="ProgressBar3" type="ProgressBar" parent="Control/MarginContainer/Pacing/Performance/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "Enjoyment in the current action.
+
+An higher value decreases time until climax"
+theme_override_styles/fill = SubResource("StyleBoxTexture_qnlqt")
+value = 98.0
+
+[node name="Label2" type="Label" parent="Control/MarginContainer/Pacing/Performance/GridContainer"]
+layout_mode = 2
+size_flags_vertical = 5
+tooltip_text = "Affinity towards you and friendship level."
+mouse_filter = 1
+text = "Love:"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="ProgressBar2" type="ProgressBar" parent="Control/MarginContainer/Pacing/Performance/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "Affinity towards you and friendship level.
+
+An higher value increses likeliness of asking to repeat."
+theme_override_styles/fill = SubResource("StyleBoxTexture_8cldt")
+value = 75.0
+
+[node name="Label3" type="Label" parent="Control/MarginContainer/Pacing/Performance/GridContainer"]
+layout_mode = 2
+size_flags_vertical = 5
+tooltip_text = "Current alignment of preferences over your body."
+mouse_filter = 1
+text = "Lust:"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="ProgressBar" type="ProgressBar" parent="Control/MarginContainer/Pacing/Performance/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "Current alignment of preferences over your body.
+
+An higher value increases the likeliness of cumming.
+
+If this bar turns RED, climax will result in cum."
+theme_override_styles/fill = SubResource("StyleBoxTexture_nlte4")
+value = 40.0

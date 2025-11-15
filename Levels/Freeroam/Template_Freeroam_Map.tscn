@@ -1,0 +1,70 @@
+[gd_scene load_steps=7 format=3 uid="uid://ngoj4so74qwk"]
+
+[ext_resource type="PackedScene" uid="uid://ccjua0u7ah6rj" path="res://Modules/turntable_cam.tscn" id="1_4rc08"]
+[ext_resource type="PackedScene" uid="uid://b5q4e5i4nbggr" path="res://UI_Elements/Freeroam_UI.tscn" id="2_07lgi"]
+[ext_resource type="PackedScene" uid="uid://bulspylc6cuby" path="res://UI_Elements/Dialoguer.tscn" id="6_dahje"]
+[ext_resource type="PackedScene" uid="uid://cubcc1b7t24dy" path="res://UI_Elements/Freeroam_Pause_Menu.tscn" id="7_3hnvq"]
+
+[sub_resource type="GDScript" id="GDScript_jbjj2"]
+script/source = "extends MapScenario
+
+func _update_player_info():
+	$UI/Pause_Menu.update_intel(Ses.curr_unit())
+	$UI/Player_UI.update_intel(Ses.curr_unit())
+
+func _on_game_paused():
+	if Ses.paused:
+		Ses.paused = false
+		prev_state()
+	else:
+		Ses.paused = true
+		next_state(\"gm_freeroam_pause\")
+"
+
+[sub_resource type="GDScript" id="GDScript_6g8wt"]
+resource_name = "UI_Department"
+script/source = "extends Node
+
+@export var elements : Array[NodePath]  ## Which UI nodes you might want to hide or show according to events.
+"
+
+[node name="Freeroam_Map" type="Node" groups=["when_paused"]]
+script = SubResource("GDScript_jbjj2")
+
+[node name="Quests" type="Node" parent="."]
+
+[node name="Cam" parent="." instance=ExtResource("1_4rc08")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.35289, 0)
+visible = false
+max_height = 5
+min_height = 2
+enable_freelook = "freelook"
+home_freelook = "home_look"
+
+[node name="Ray" type="RayCast3D" parent="."]
+collision_mask = 11
+collide_with_areas = true
+
+[node name="Environ" type="Node" parent="."]
+
+[node name="Grids" type="Node3D" parent="Environ"]
+
+[node name="Zones" type="Node3D" parent="Environ"]
+
+[node name="Lights" type="Node3D" parent="Environ"]
+
+[node name="Terrain" type="Node3D" parent="Environ"]
+
+[node name="Gizmos" type="Node" parent="."]
+
+[node name="UI" type="Node" parent="."]
+script = SubResource("GDScript_6g8wt")
+elements = Array[NodePath]([NodePath("Player_UI"), NodePath("Subtitles"), NodePath("Pause_Menu")])
+
+[node name="Player_UI" parent="UI" instance=ExtResource("2_07lgi")]
+
+[node name="Subtitles" parent="UI" instance=ExtResource("6_dahje")]
+offset_top = -179.0
+
+[node name="Pause_Menu" parent="UI" instance=ExtResource("7_3hnvq")]
+visible = false

@@ -1,0 +1,161 @@
+[gd_scene load_steps=4 format=3 uid="uid://c8ffy1myt7uug"]
+
+[ext_resource type="Texture2D" uid="uid://b6q7luyfhqugi" path="res://misc/textures/Chevron_Detachment_Seibra_Exfon.png" id="1_bekte"]
+
+[sub_resource type="GDScript" id="GDScript_mditu"]
+script/source = "extends Control
+
+
+func _input(event):
+	if event is InputEventMouseButton and event.is_released():
+		if event.button_index in [MOUSE_BUTTON_LEFT, MOUSE_BUTTON_RIGHT]:
+			%Landing_Area.hide()
+			%Catalogue/VBoxContainer.show()
+
+
+func _on_thumbnail_pressed():
+	%Landing_Area.show()
+	%Catalogue/HFlowContainer.hide()
+
+
+func _on_closure_pressed():
+	get_tree().change_scene_to_file(\"res://Menus/Main_Menu.tscn\")
+"
+
+[sub_resource type="LabelSettings" id="LabelSettings_ceqrd"]
+font_size = 28
+font_color = Color(1, 1, 0, 1)
+outline_size = 12
+outline_color = Color(0, 0, 0, 1)
+
+[node name="Gallery" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = SubResource("GDScript_mditu")
+
+[node name="HSplitContainer" type="HSplitContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Sidebar" type="MarginContainer" parent="HSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HSplitContainer/Sidebar"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HSplitContainer/Sidebar/VBoxContainer"]
+layout_mode = 2
+
+[node name="closure" type="Button" parent="HSplitContainer/Sidebar/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+tooltip_text = "Return to Menu"
+text = "<
+<
+<"
+
+[node name="Title" type="Label" parent="HSplitContainer/Sidebar/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Album
+of Unlocks"
+label_settings = SubResource("LabelSettings_ceqrd")
+horizontal_alignment = 1
+
+[node name="Description" type="Label" parent="HSplitContainer/Sidebar/VBoxContainer"]
+layout_mode = 2
+autowrap_mode = 3
+
+[node name="Catalogue" type="MarginContainer" parent="HSplitContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 4.0
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HSplitContainer/Catalogue"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 4.0
+
+[node name="Filters" type="HBoxContainer" parent="HSplitContainer/Catalogue/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HSplitContainer/Catalogue/VBoxContainer/Filters"]
+layout_mode = 2
+text = "Filter: "
+
+[node name="Dan_Sel" type="Button" parent="HSplitContainer/Catalogue/VBoxContainer/Filters"]
+layout_mode = 2
+toggle_mode = true
+button_pressed = true
+text = "Danavo"
+
+[node name="GRT_Sel" type="Button" parent="HSplitContainer/Catalogue/VBoxContainer/Filters"]
+layout_mode = 2
+toggle_mode = true
+button_pressed = true
+text = "Agarthian"
+
+[node name="VSeparator" type="VSeparator" parent="HSplitContainer/Catalogue/VBoxContainer/Filters"]
+layout_mode = 2
+
+[node name="Chara_Sel" type="Button" parent="HSplitContainer/Catalogue/VBoxContainer/Filters"]
+layout_mode = 2
+toggle_mode = true
+button_pressed = true
+text = "Characters"
+
+[node name="Weap_Sel" type="Button" parent="HSplitContainer/Catalogue/VBoxContainer/Filters"]
+layout_mode = 2
+toggle_mode = true
+button_pressed = true
+text = "Weapons"
+
+[node name="Artif_Sel" type="Button" parent="HSplitContainer/Catalogue/VBoxContainer/Filters"]
+layout_mode = 2
+toggle_mode = true
+button_pressed = true
+text = "Artifacts"
+
+[node name="Archi_Sel" type="Button" parent="HSplitContainer/Catalogue/VBoxContainer/Filters"]
+layout_mode = 2
+toggle_mode = true
+button_pressed = true
+text = "Architecture"
+
+[node name="Sex_Sel" type="Button" parent="HSplitContainer/Catalogue/VBoxContainer/Filters"]
+visible = false
+layout_mode = 2
+toggle_mode = true
+button_pressed = true
+text = "Sex Scenes"
+
+[node name="Thumbnails" type="HFlowContainer" parent="HSplitContainer/Catalogue/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Landing_Area" type="TextureRect" parent="HSplitContainer/Catalogue"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+texture = ExtResource("1_bekte")
+expand_mode = 3
+stretch_mode = 5
+
+[connection signal="pressed" from="HSplitContainer/Sidebar/VBoxContainer/HBoxContainer/closure" to="." method="_on_closure_pressed"]

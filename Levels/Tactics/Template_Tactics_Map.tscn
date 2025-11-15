@@ -1,0 +1,115 @@
+[gd_scene load_steps=8 format=3 uid="uid://p73vbht7wunk"]
+
+[ext_resource type="PackedScene" uid="uid://ccjua0u7ah6rj" path="res://Modules/turntable_cam.tscn" id="1_ov0pd"]
+[ext_resource type="PackedScene" uid="uid://d1ywhrys6kuyn" path="res://UI_Elements/Tactics_UI_Sidebar.tscn" id="3_uh38v"]
+[ext_resource type="PackedScene" uid="uid://4gr1xx145ick" path="res://UI_Elements/Tactics_UI_Character.tscn" id="4_2lng0"]
+[ext_resource type="PackedScene" uid="uid://dq84n25twu0fv" path="res://UI_Elements/Tactics_Pause_Menu.tscn" id="5_p2fiu"]
+[ext_resource type="PackedScene" uid="uid://bulspylc6cuby" path="res://UI_Elements/Dialoguer.tscn" id="6_8k8fg"]
+
+[sub_resource type="GDScript" id="GDScript_kw4lm"]
+script/source = "extends MapScenario
+
+var tgt_portrait = preload(\"res://UI_Elements/target_portrait.tscn\")
+
+func _update_player_info():
+	%Character.update_intel(Ses.curr_unit())
+	%Sidebar._on_action_selected(Ses.curr_unit().stt)
+
+
+func _on_game_paused():
+	if Ses.paused:
+		Ses.paused = false
+		prev_state()
+	else:
+		Ses.paused = true
+		next_state(\"gm_generic_pause\")
+
+
+func _on_sidebar_force_end_turn() -> void:
+	if stt == \"gm_generic_player\":
+		prev_state()
+
+func _on_enemy_ui_proceed() -> void:
+	if stt == \"gm_generic_npc\":
+		states[stt].manual_perform_decision()
+"
+
+[sub_resource type="GDScript" id="GDScript_53kae"]
+resource_name = "UI_Department"
+script/source = "extends Node
+
+@export var elements : Array[NodePath]  ## Which UI nodes you might want to hide or show according to events.
+"
+
+[node name="Tactics_Map" type="Node" groups=["when_paused"]]
+script = SubResource("GDScript_kw4lm")
+
+[node name="Quests" type="Node" parent="."]
+
+[node name="Cam" parent="." instance=ExtResource("1_ov0pd")]
+transform = Transform3D(-0.707107, 0.353553, -0.612372, 0, 0.866025, 0.5, 0.707107, 0.353553, -0.612372, 0, 2.35289, 0)
+max_height = 5
+min_height = 2
+enable_freelook = "freelook"
+home_freelook = "home_look"
+
+[node name="Ray" type="RayCast3D" parent="."]
+collision_mask = 11
+collide_with_areas = true
+
+[node name="Environ" type="Node" parent="."]
+
+[node name="Grids" type="Node3D" parent="Environ"]
+
+[node name="Zones" type="Node3D" parent="Environ"]
+
+[node name="Lights" type="Node3D" parent="Environ"]
+
+[node name="Terrain" type="Node3D" parent="Environ"]
+
+[node name="Gizmos" type="Node" parent="."]
+
+[node name="UI" type="Node" parent="."]
+script = SubResource("GDScript_53kae")
+elements = Array[NodePath]([NodePath("Player_UI/HBoxContainer/Sidebar"), NodePath("Player_UI/HBoxContainer/Character"), NodePath("Pause_Menu"), NodePath("Subtitles")])
+
+[node name="Player_UI" type="MarginContainer" parent="UI"]
+unique_name_in_owner = true
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/Player_UI"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Sidebar" parent="UI/Player_UI/HBoxContainer" instance=ExtResource("3_uh38v")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Character" parent="UI/Player_UI/HBoxContainer" instance=ExtResource("4_2lng0")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 8
+
+[node name="Pause_Menu" parent="UI" instance=ExtResource("5_p2fiu")]
+unique_name_in_owner = true
+visible = false
+offset_right = 866.0
+offset_bottom = 6245.0
+
+[node name="Subtitles" parent="UI" instance=ExtResource("6_8k8fg")]
+unique_name_in_owner = true
+visible = false
+
+[connection signal="force_end_turn" from="UI/Player_UI/HBoxContainer/Sidebar" to="." method="_on_sidebar_force_end_turn"]
+[connection signal="action_select" from="UI/Player_UI/HBoxContainer/Character" to="." method="_on_character_action_select"]
+[connection signal="action_select" from="UI/Player_UI/HBoxContainer/Character" to="UI/Player_UI/HBoxContainer/Sidebar" method="_on_action_selected"]

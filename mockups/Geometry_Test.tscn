@@ -1,0 +1,87 @@
+[gd_scene load_steps=3 format=3 uid="uid://bg70elkdftyje"]
+
+[sub_resource type="GDScript" id="GDScript_mesom"]
+script/source = "extends Control
+
+var points : Array[Vector2]
+
+func _ready() -> void:
+	%ColorRect.top = self
+
+func add_point(where:Vector2):
+	points.append(where)
+	var label = str(where.x) + \" : \" + str(where.y)
+	%points.add_item(label)
+	%ColorRect.queue_redraw()
+	
+func _on_remove_pressed() -> void:
+	var new_points : Array[Vector2]
+	var select = %points.get_selected_items()
+	for i in range(points.size()):
+		if not i in select:
+			new_points.append(points[i])
+	%points.clear()
+	points.clear()
+	for point in new_points:
+		add_point(point)
+"
+
+[sub_resource type="GDScript" id="GDScript_cw65b"]
+script/source = "extends ColorRect
+
+var top : Control
+
+func _gui_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.is_released():
+		top.add_point(event.position)
+
+func _draw() -> void:
+	if top == null:
+		return
+		
+	for point in top.points:
+		draw_circle(point, 3, Color.ANTIQUE_WHITE)
+	
+	var center = Math.centroid(top.points)
+	draw_circle(center, 3, Color.DARK_RED)
+"
+
+[node name="GeometryTest" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = SubResource("GDScript_mesom")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer"]
+layout_mode = 2
+
+[node name="remove" type="Button" parent="HBoxContainer/VBoxContainer"]
+layout_mode = 2
+text = "DELETE"
+
+[node name="points" type="ItemList" parent="HBoxContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_vertical = 3
+select_mode = 2
+
+[node name="ColorRect" type="ColorRect" parent="HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.197937, 0.197937, 0.197937, 1)
+script = SubResource("GDScript_cw65b")
+
+[connection signal="pressed" from="HBoxContainer/VBoxContainer/remove" to="." method="_on_remove_pressed"]

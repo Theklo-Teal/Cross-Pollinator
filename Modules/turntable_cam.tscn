@@ -1,0 +1,76 @@
+[gd_scene load_steps=2 format=3 uid="uid://ccjua0u7ah6rj"]
+
+[sub_resource type="GDScript" id="GDScript_qc7yt"]
+resource_name = "turntable_cam"
+script/source = "extends Node3D
+@export var speed : float = 10  ## Bigger number is faster
+@export var torque : float = 100  ## Bigger number is slower
+@export var speed_scaling : float = 0.0  ## How much speed changes with higher camera height? 0 means there's no change in speed.
+@export var focus_distance : float = 4.0  ## How far is the camera from the gimbal it rotates around.
+@export var max_height : int = 10  ## Camera Ceiling
+@export var min_height : int = 0  ## Camera Floor
+@export var enable_freelook : String = \"\"  ## Choose InputMap action that can be used to pitch the camera away from the focus point.
+@export var home_freelook : String = \"\"  ## Choose InputMap action to return the camera to the focus point.
+@export var can_pitch := true  ## Dragging with middle mouse button allows rotation up and down.
+
+var target_height := 0.0
+
+var disabled := true  # Can the player control the camera?
+
+func _ready():
+	target_height = clamp(target_height, min_height, max_height)
+	$Cam.position.z = focus_distance
+
+func _physics_process(delta):
+	if disabled:
+		return
+	var sway = Input.get_axis(\"left\", \"right\")
+	var surge = Input.get_axis(\"forward\", \"backward\")
+	var scaled_speed = ((target_height - min_height) * speed_scaling + 1) * speed
+	position += (basis.x * Vector3(1,0,1)) * sway * delta * scaled_speed
+	position += (basis.z * Vector3(1,0,1)) * surge * delta * scaled_speed
+	position.y = move_toward(position.y, target_height, delta * speed)
+
+func _unhandled_input(event):
+	if disabled:
+		return
+	if event is InputEventMouseButton:
+		if event.is_action_released(\"cam_elevation_up\"):
+			target_height = min(max_height, target_height + 1)
+		elif event.is_action_released(\"cam_elevation_down\"):
+			target_height = max(min_height, target_height - 1)
+		# Constrain Mouse for rotation
+		elif event.button_index == MOUSE_BUTTON_MIDDLE:
+			if event.is_pressed():
+				Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+			elif event.is_released():
+				Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+				
+	
+	if event is InputEventMouseMotion:
+		if Input.is_mouse_button_pressed(MOUSE_BUTTON_MIDDLE):
+			# Rotate Camera
+			rotation.y -= event.relative.x / torque
+			rotation.y = wrap(rotation.y, -PI, PI)
+			if not enable_freelook.is_empty() and Input.is_action_pressed(enable_freelook):
+				$Cam.rotation.x -= event.relative.y / torque
+				$Cam.rotation.x = clamp($Cam.rotation.x, -PI * 0.5, PI * 0.5)
+			elif can_pitch:
+				rotation.x -= event.relative.y / torque
+				rotation.x = clamp(rotation.x, -PI * 0.45, -0.01)
+				
+	if not home_freelook.is_empty() and event is InputEventKey and event.is_action_released(home_freelook):
+		#WARNING: Camera3D rotation (not any parent gimbal node) will break raycasting
+		$Cam.rotation = Vector3.ZERO
+				
+func get_click_direction(viewport_coord:Vector2):
+	return $Cam.project_local_ray_normal(viewport_coord)
+	
+"
+
+[node name="Gimbal" type="Node3D"]
+script = SubResource("GDScript_qc7yt")
+
+[node name="Cam" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4)
+fov = 55.0

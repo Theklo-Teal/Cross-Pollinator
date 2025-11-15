@@ -1,0 +1,278 @@
+[gd_scene load_steps=17 format=3 uid="uid://cm68tgdco2n4h"]
+
+[ext_resource type="PackedScene" uid="uid://baxh3p5tay3vu" path="res://UI_Elements/music_credit_info.tscn" id="1_lupi0"]
+[ext_resource type="PackedScene" uid="uid://dfbfwxd8rchpd" path="res://UI_Elements/accordion_header.tscn" id="1_mvii2"]
+[ext_resource type="AudioStream" uid="uid://b6ugntbck6yxr" path="res://Assets/Music/Clean Soul.mp3" id="2_qsgjt"]
+[ext_resource type="AudioStream" uid="uid://dpd1faemwdamc" path="res://Assets/Music/Dhaka.mp3" id="3_bane4"]
+[ext_resource type="AudioStream" uid="uid://b7javb0rid7am" path="res://Assets/Music/I Can Feel it Coming.mp3" id="4_3pjmm"]
+[ext_resource type="AudioStream" uid="uid://bqa3rfyfvur35" path="res://Assets/Music/Industrial Cinematic.mp3" id="5_jns5k"]
+[ext_resource type="AudioStream" uid="uid://b7au30qvjwcnh" path="res://Assets/Music/Mirage.mp3" id="6_q4n7k"]
+[ext_resource type="AudioStream" uid="uid://baeuj8tbxcyj4" path="res://Assets/Music/River of Io.mp3" id="7_87gh5"]
+[ext_resource type="AudioStream" uid="uid://bsi26fkdgt08u" path="res://Assets/Music/Static Motion.mp3" id="8_ducma"]
+[ext_resource type="AudioStream" uid="uid://cl3bvcv2vtq35" path="res://Assets/Music/Equatorial Complex.mp3" id="10_uuvvc"]
+[ext_resource type="AudioStream" uid="uid://brg23infc5k82" path="res://Assets/Music/Unlicensed/Ending_Theme.mp3" id="11_y4efq"]
+[ext_resource type="AudioStream" uid="uid://debn7djkkifl8" path="res://Assets/Music/Unlicensed/Elastica - Image Change.mp3" id="12_4oqwa"]
+[ext_resource type="AudioStream" uid="uid://dw6qn2y0e0f58" path="res://Assets/Music/Unlicensed/Catherine_Theme.mp3" id="13_u42fn"]
+
+[sub_resource type="GDScript" id="GDScript_qu4vq"]
+script/source = "extends MarginContainer
+
+var jukebox = preload(\"res://UI_Elements/jukebox_button_group.tres\")
+
+func _ready():
+	randomize()
+	var song_list : Array
+	for each in get_tree().get_nodes_in_group(\"jukebox\"):
+		each.button_group = jukebox
+		if \"auto_play\" in each and each.auto_play == true:
+			song_list.append(each)
+			
+	
+	if not song_list.is_empty():
+		song_list.pick_random().play()
+		#var default_track = song_list.pick_random()
+		#curr_playtrack = get_parent().get_node(\"%Music/\"+default_track.name)
+		#curr_playtrack.play()
+
+func _on_credits_closure_pressed():
+	hide()
+
+func _on_accordion_collapse_toggled(toggled_on):
+	for each in %Accordion.get_children():
+		each.button_pressed = toggled_on
+"
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pa4wc"]
+content_margin_left = 25.0
+content_margin_top = 25.0
+content_margin_right = 25.0
+content_margin_bottom = 25.0
+bg_color = Color(0.259294, 0.259294, 0.259294, 1)
+border_width_left = 6
+border_width_top = 6
+border_width_right = 20
+border_width_bottom = 20
+border_color = Color(0.129587, 0.112047, 0.0206324, 1)
+border_blend = true
+corner_radius_top_right = 50
+corner_radius_bottom_left = 50
+
+[sub_resource type="LabelSettings" id="LabelSettings_7dggb"]
+font_size = 20
+font_color = Color(0.615686, 0.666667, 0.313726, 1)
+outline_size = 2
+outline_color = Color(0.615686, 0.666667, 0.313726, 1)
+
+[node name="Credits" type="MarginContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 50
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 35
+script = SubResource("GDScript_qu4vq")
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_pa4wc")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Credits_Closure" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Close"
+
+[node name="Accordion_Collapse" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+toggle_mode = true
+text = "Collapse Categories"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 2
+
+[node name="Accordion" type="VBoxContainer" parent="PanelContainer/VBoxContainer/ScrollContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Program" parent="PanelContainer/VBoxContainer/ScrollContainer/Accordion" instance=ExtResource("1_mvii2")]
+layout_mode = 2
+text = "PROGRAMMING"
+button_pressed = true
+font_size = 24
+font_color = Color(1, 1, 1, 1)
+
+[node name="Program_List" type="GridContainer" parent="PanelContainer/VBoxContainer/ScrollContainer/Accordion/Program"]
+unique_name_in_owner = true
+layout_mode = 2
+columns = 2
+
+[node name="Label" type="Label" parent="PanelContainer/VBoxContainer/ScrollContainer/Accordion/Program/Program_List"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Main Programmer"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Label2" type="Label" parent="PanelContainer/VBoxContainer/ScrollContainer/Accordion/Program/Program_List"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Diogo \"Vexing\" Duarte"
+label_settings = SubResource("LabelSettings_7dggb")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Label3" type="Label" parent="PanelContainer/VBoxContainer/ScrollContainer/Accordion/Program/Program_List"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Interface Design"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Label4" type="Label" parent="PanelContainer/VBoxContainer/ScrollContainer/Accordion/Program/Program_List"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Diogo \"Vexing\" Duarte"
+label_settings = SubResource("LabelSettings_7dggb")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Label5" type="Label" parent="PanelContainer/VBoxContainer/ScrollContainer/Accordion/Program/Program_List"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Artificial Intelligence"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Label6" type="Label" parent="PanelContainer/VBoxContainer/ScrollContainer/Accordion/Program/Program_List"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Diogo \"Vexing\" Duarte"
+label_settings = SubResource("LabelSettings_7dggb")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Music" parent="PanelContainer/VBoxContainer/ScrollContainer/Accordion" instance=ExtResource("1_mvii2")]
+layout_mode = 2
+text = "MUSIC"
+button_pressed = true
+font_size = 24
+font_color = Color(1, 1, 1, 1)
+
+[node name="Music_List" type="HFlowContainer" parent="PanelContainer/VBoxContainer/ScrollContainer/Accordion/Music"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Clean Soul" parent="PanelContainer/VBoxContainer/ScrollContainer/Accordion/Music/Music_List" instance=ExtResource("1_lupi0")]
+layout_mode = 2
+stream = ExtResource("2_qsgjt")
+url = "https://incompetech.com/music/royalty-free/music.html"
+auto_play = true
+description = "Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 3.0
+http://creativecommons.org/licenses/by/3.0/"
+
+[node name="Dhaka" parent="PanelContainer/VBoxContainer/ScrollContainer/Accordion/Music/Music_List" instance=ExtResource("1_lupi0")]
+layout_mode = 2
+stream = ExtResource("3_bane4")
+url = "https://incompetech.com/music/royalty-free/music.html"
+auto_play = true
+description = "Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 3.0
+http://creativecommons.org/licenses/by/3.0/"
+
+[node name="I Can Feel it Coming" parent="PanelContainer/VBoxContainer/ScrollContainer/Accordion/Music/Music_List" instance=ExtResource("1_lupi0")]
+layout_mode = 2
+stream = ExtResource("4_3pjmm")
+url = "https://incompetech.com/music/royalty-free/music.html"
+auto_play = true
+description = "Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 3.0
+http://creativecommons.org/licenses/by/3.0/"
+
+[node name="Industrial Cinematic" parent="PanelContainer/VBoxContainer/ScrollContainer/Accordion/Music/Music_List" instance=ExtResource("1_lupi0")]
+layout_mode = 2
+stream = ExtResource("5_jns5k")
+url = "https://incompetech.com/music/royalty-free/music.html"
+auto_play = true
+description = "Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 3.0
+http://creativecommons.org/licenses/by/3.0/"
+
+[node name="Mirage" parent="PanelContainer/VBoxContainer/ScrollContainer/Accordion/Music/Music_List" instance=ExtResource("1_lupi0")]
+layout_mode = 2
+stream = ExtResource("6_q4n7k")
+url = "https://incompetech.com/music/royalty-free/music.html"
+auto_play = true
+description = "Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 3.0
+http://creativecommons.org/licenses/by/3.0/"
+
+[node name="River of Io" parent="PanelContainer/VBoxContainer/ScrollContainer/Accordion/Music/Music_List" instance=ExtResource("1_lupi0")]
+layout_mode = 2
+stream = ExtResource("7_87gh5")
+url = "https://incompetech.com/music/royalty-free/music.html"
+auto_play = true
+description = "Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 3.0
+http://creativecommons.org/licenses/by/3.0/"
+
+[node name="Static Motion" parent="PanelContainer/VBoxContainer/ScrollContainer/Accordion/Music/Music_List" instance=ExtResource("1_lupi0")]
+layout_mode = 2
+stream = ExtResource("8_ducma")
+url = "https://incompetech.com/music/royalty-free/music.html"
+auto_play = true
+description = "Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 3.0
+http://creativecommons.org/licenses/by/3.0/"
+
+[node name="Equatorial Complex" parent="PanelContainer/VBoxContainer/ScrollContainer/Accordion/Music/Music_List" instance=ExtResource("1_lupi0")]
+layout_mode = 2
+stream = ExtResource("10_uuvvc")
+url = "https://incompetech.com/music/royalty-free/music.html"
+auto_play = true
+description = "Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 3.0
+http://creativecommons.org/licenses/by/3.0/"
+
+[node name="Kid 2000 (12in Original Mix)" parent="PanelContainer/VBoxContainer/ScrollContainer/Accordion/Music/Music_List" instance=ExtResource("1_lupi0")]
+layout_mode = 2
+stream = ExtResource("11_y4efq")
+description = "Hybrid
+Wide Angle
+Production: Distinctive Records, 1999"
+
+[node name="Image Change" parent="PanelContainer/VBoxContainer/ScrollContainer/Accordion/Music/Music_List" instance=ExtResource("1_lupi0")]
+layout_mode = 2
+stream = ExtResource("12_4oqwa")
+auto_play = true
+description = "Elastica
+The Menace
+Production: Atlantic Records
+2000"
+
+[node name="Original" parent="PanelContainer/VBoxContainer/ScrollContainer/Accordion/Music/Music_List" instance=ExtResource("1_lupi0")]
+layout_mode = 2
+stream = ExtResource("13_u42fn")
+auto_play = true
+description = "Leftfield
+Leftism
+Publisher: Columbia Records, 1995"
+
+[connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer/Credits_Closure" to="." method="_on_credits_closure_pressed"]
+[connection signal="toggled" from="PanelContainer/VBoxContainer/HBoxContainer/Accordion_Collapse" to="." method="_on_accordion_collapse_toggled"]

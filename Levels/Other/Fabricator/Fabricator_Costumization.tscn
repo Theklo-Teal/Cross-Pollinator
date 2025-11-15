@@ -1,0 +1,1138 @@
+[gd_scene load_steps=8 format=3 uid="uid://myuvgvecht38"]
+
+[ext_resource type="AudioStream" uid="uid://cl3bvcv2vtq35" path="res://Assets/Music/Equatorial Complex.mp3" id="1_7w5q8"]
+[ext_resource type="PackedScene" uid="uid://dfbfwxd8rchpd" path="res://UI_Elements/accordion_header.tscn" id="2_w27tf"]
+[ext_resource type="PackedScene" uid="uid://u80vjr3wje3g" path="res://misc/models/Female Fighter.glb" id="4_qskii"]
+
+[sub_resource type="GDScript" id="GDScript_eeveb"]
+script/source = "extends Node
+
+var timer := 0.0
+
+func _process(delta):
+	timer += delta
+	
+	if timer >= 0.05:
+		timer = 0
+		var pitch = Input.get_axis(\"forward\", \"backward\") * 0.03
+		var yaw = Input.get_axis(\"left\", \"right\") * 0.1
+		
+		%Cam.rotate_x(pitch)
+		%Cam.rotation.x = clamp(%Cam.rotation.x, -deg_to_rad(45), deg_to_rad(45))
+		%Character.rotate_y(yaw)
+
+
+func _unhandled_input(event):
+	
+	if event is InputEventMouseButton and event.is_released():
+		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+			%Cam.position.y = clamp(%Cam.position.y + 0.1, 0.1, 2.2)
+		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			%Cam.position.y = clamp(%Cam.position.y - 0.1, 0.1, 2.2)
+		elif event.button_index == MOUSE_BUTTON_WHEEL_LEFT:
+			%Character.rotate_y(0.1)
+		elif event.button_index == MOUSE_BUTTON_WHEEL_RIGHT:
+			%Character.rotate_y(-0.1)
+"
+
+[sub_resource type="GDScript" id="GDScript_dxk76"]
+script/source = "extends MarginContainer
+
+var tooltip_theme = preload(\"res://UI_Elements/Tooltip_Theme.tres\")
+
+func _make_custom_tooltip(for_text:String):
+	#TODO: Figure out how to make all children inherit this method
+	var panel := PanelContainer.new()
+	var labl = Label.new()
+	labl.text = for_text
+	panel.add_child(labl)
+	panel.set_theme(tooltip_theme)
+	return panel
+"
+
+[sub_resource type="LabelSettings" id="LabelSettings_c13kh"]
+font_color = Color(0.556863, 0.552941, 0, 1)
+outline_size = 4
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_rg15j"]
+font_size = 42
+font_color = Color(0.556863, 0.552941, 0, 1)
+outline_size = 12
+outline_color = Color(0, 0, 0, 1)
+
+[node name="FabricatorCostumization" type="Node"]
+script = SubResource("GDScript_eeveb")
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("1_7w5q8")
+autoplay = true
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+script = SubResource("GDScript_dxk76")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="Title_Bar" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/Title_Bar"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Title_Bar/VBoxContainer"]
+layout_mode = 2
+text = "Agarthian Transporter"
+label_settings = SubResource("LabelSettings_c13kh")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Label2" type="Label" parent="MarginContainer/VBoxContainer/Title_Bar/VBoxContainer"]
+layout_mode = 2
+text = "Body Modification Mode"
+label_settings = SubResource("LabelSettings_c13kh")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Label2" type="Label" parent="MarginContainer/VBoxContainer/Title_Bar"]
+layout_mode = 2
+text = "SEIGRO GAMMA"
+label_settings = SubResource("LabelSettings_rg15j")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Contents" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/VBoxContainer/Contents"]
+layout_mode = 2
+mouse_filter = 0
+mouse_force_pass_scroll_events = false
+
+[node name="Option_Count" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2"]
+layout_mode = 2
+
+[node name="Flavour" type="Label" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Option_Count"]
+layout_mode = 2
+tooltip_text = "162 traits can be acquired through sexual melding.
+
+This body can gain latent epigenetic options through horizontal gene transfer when having sex."
+mouse_filter = 1
+text = "Collected Blueprints:
+Horizontal Gene Transfere:
+Total Genes Available:"
+
+[node name="Numbers" type="Label" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Option_Count"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "35
+20
+65 / 200"
+horizontal_alignment = 1
+
+[node name="Materials_Gauge" type="GridContainer" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+columns = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Materials_Gauge"]
+layout_mode = 2
+text = "Biomatter Reserve"
+vertical_alignment = 2
+
+[node name="Label3" type="Label" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Materials_Gauge"]
+layout_mode = 2
+text = "Cost"
+vertical_alignment = 1
+
+[node name="ProgressBar" type="ProgressBar" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Materials_Gauge"]
+layout_mode = 2
+size_flags_horizontal = 3
+value = 69.0
+
+[node name="Selection_Cost" type="Label" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Materials_Gauge"]
+layout_mode = 2
+text = " 8"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Energy_Gauge" type="GridContainer" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+columns = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Energy_Gauge"]
+layout_mode = 2
+text = "Orgone Flow"
+vertical_alignment = 2
+
+[node name="Label3" type="Label" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Energy_Gauge"]
+layout_mode = 2
+text = "Cost"
+vertical_alignment = 1
+
+[node name="ProgressBar" type="ProgressBar" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Energy_Gauge"]
+layout_mode = 2
+size_flags_horizontal = 3
+value = 42.0
+
+[node name="Selection_Cost" type="Label" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Energy_Gauge"]
+layout_mode = 2
+text = "26"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2"]
+layout_mode = 2
+
+[node name="Options" type="ScrollContainer" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Accordion" type="VBoxContainer" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+
+[node name="Hair" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion" instance=ExtResource("2_w27tf")]
+layout_mode = 2
+text = "Head"
+button_pressed = true
+
+[node name="Headwear" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Hair"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Hair/Headwear"]
+layout_mode = 2
+text = "Headwear:"
+
+[node name="OptionButton" type="OptionButton" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Hair/Headwear"]
+layout_mode = 2
+selected = 0
+item_count = 6
+popup/item_0/text = "None"
+popup/item_0/id = 0
+popup/item_1/text = "Headphones"
+popup/item_1/id = 1
+popup/item_2/text = "Agarthian Headband"
+popup/item_2/id = 4
+popup/item_3/text = "Terran Headband"
+popup/item_3/id = 2
+popup/item_4/text = "Hairclips"
+popup/item_4/id = 3
+popup/item_5/text = "Horns"
+popup/item_5/id = 5
+
+[node name="Style" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Hair"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Hair/Style"]
+layout_mode = 2
+text = "Hairstyle:
+"
+
+[node name="OptionButton" type="OptionButton" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Hair/Style"]
+layout_mode = 2
+selected = 1
+item_count = 14
+popup/item_0/text = "Bald"
+popup/item_0/id = 0
+popup/item_1/text = "Seibra Style"
+popup/item_1/id = 1
+popup/item_2/text = "Exfon Style"
+popup/item_2/id = 4
+popup/item_3/text = "Catherine Style"
+popup/item_3/id = 2
+popup/item_4/text = "Ethan Style"
+popup/item_4/id = 3
+popup/item_5/text = "Sven Style"
+popup/item_5/id = 5
+popup/item_6/text = "Lesbian Bowl"
+popup/item_6/id = 6
+popup/item_7/text = "Military Cut"
+popup/item_7/id = 7
+popup/item_8/text = "Punk Rock"
+popup/item_8/id = 8
+popup/item_9/text = "Long & Flowing"
+popup/item_9/id = 9
+popup/item_10/text = "Sophisticated Bangs"
+popup/item_10/id = 10
+popup/item_11/text = "Wild Comb"
+popup/item_11/id = 11
+popup/item_12/text = "Braided"
+popup/item_12/id = 13
+popup/item_13/text = "Asari"
+popup/item_13/id = 12
+
+[node name="Color" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Hair"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Hair/Color"]
+layout_mode = 2
+text = "Hair Color:"
+
+[node name="OptionButton" type="OptionButton" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Hair/Color"]
+layout_mode = 2
+selected = 0
+item_count = 13
+popup/item_0/text = "Natural"
+popup/item_0/id = 0
+popup/item_1/text = "Black"
+popup/item_1/id = 1
+popup/item_2/text = "Brunette"
+popup/item_2/id = 4
+popup/item_3/text = "Redhead"
+popup/item_3/id = 2
+popup/item_4/text = "Blond"
+popup/item_4/id = 3
+popup/item_5/text = "White"
+popup/item_5/id = 5
+popup/item_6/text = "Iridiscent Black"
+popup/item_6/id = 6
+popup/item_7/text = "Blue"
+popup/item_7/id = 7
+popup/item_8/text = "Punkrock"
+popup/item_8/id = 8
+popup/item_9/text = "Long & Flowing"
+popup/item_9/id = 9
+popup/item_10/text = "Sophisticated Bangs"
+popup/item_10/id = 10
+popup/item_11/text = "Wild Comb"
+popup/item_11/id = 11
+popup/item_12/text = "Ansari"
+popup/item_12/id = 12
+
+[node name="Button18" type="CheckButton" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Hair"]
+layout_mode = 2
+text = "Glowing Hair"
+
+[node name="Button19" type="CheckButton" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Hair"]
+layout_mode = 2
+text = "Piercing"
+
+[node name="Skin" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion" instance=ExtResource("2_w27tf")]
+layout_mode = 2
+text = "Skin"
+
+[node name="Type" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Skin"]
+visible = false
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Skin/Type"]
+layout_mode = 2
+text = "Skin Type:"
+
+[node name="OptionButton" type="OptionButton" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Skin/Type"]
+layout_mode = 2
+selected = 0
+item_count = 5
+popup/item_0/text = "Human"
+popup/item_0/id = 0
+popup/item_1/text = "Reptile Scales"
+popup/item_1/id = 1
+popup/item_2/text = "Fish Scales"
+popup/item_2/id = 2
+popup/item_3/text = "Slimey"
+popup/item_3/id = 3
+popup/item_4/text = "Photosynthetic"
+popup/item_4/id = 4
+
+[node name="Patterns" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Skin"]
+visible = false
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Skin/Patterns"]
+layout_mode = 2
+text = "Tone Pattern: "
+
+[node name="OptionButton" type="OptionButton" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Skin/Patterns"]
+layout_mode = 2
+selected = 0
+item_count = 3
+popup/item_0/text = "Plain"
+popup/item_0/id = 0
+popup/item_1/text = "Counter Shading"
+popup/item_1/id = 1
+popup/item_2/text = "Calico"
+popup/item_2/id = 2
+
+[node name="Blemishes" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Skin"]
+visible = false
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Skin/Blemishes"]
+layout_mode = 2
+text = "Blemishes:"
+
+[node name="OptionButton" type="OptionButton" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Skin/Blemishes"]
+layout_mode = 2
+selected = 1
+item_count = 5
+popup/item_0/text = "None"
+popup/item_0/id = 0
+popup/item_1/text = "Freckled"
+popup/item_1/id = 1
+popup/item_2/text = "Light Emitting"
+popup/item_2/id = 2
+popup/item_3/text = "Scar"
+popup/item_3/id = 3
+popup/item_4/text = "Burn"
+popup/item_4/id = 4
+
+[node name="Tattoos" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Skin"]
+visible = false
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Skin/Tattoos"]
+layout_mode = 2
+text = "Tattoos
+"
+
+[node name="OptionButton" type="OptionButton" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Skin/Tattoos"]
+layout_mode = 2
+selected = 1
+item_count = 4
+popup/item_0/text = "None"
+popup/item_0/id = 0
+popup/item_1/text = "Agarthian Service Tattoos"
+popup/item_1/id = 1
+popup/item_2/text = "Personal Tattoos"
+popup/item_2/id = 2
+popup/item_3/text = "Extra Tattoos"
+popup/item_3/id = 3
+
+[node name="HFlowContainer8" type="HFlowContainer" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Skin"]
+visible = false
+layout_mode = 2
+
+[node name="Torso" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion" instance=ExtResource("2_w27tf")]
+layout_mode = 2
+text = "Torso"
+
+[node name="Type" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Torso"]
+visible = false
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Torso/Type"]
+layout_mode = 2
+text = "Type:"
+
+[node name="OptionButton" type="OptionButton" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Torso/Type"]
+layout_mode = 2
+selected = 0
+item_count = 4
+popup/item_0/text = "Average"
+popup/item_0/id = 0
+popup/item_1/text = "Toned Muscles"
+popup/item_1/id = 1
+popup/item_2/text = "Petit"
+popup/item_2/id = 2
+popup/item_3/text = "Smooth Belly"
+popup/item_3/id = 3
+
+[node name="Extras" type="HFlowContainer" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Torso"]
+visible = false
+layout_mode = 2
+
+[node name="Button7" type="Button" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Torso/Extras"]
+layout_mode = 2
+text = "Enlogated"
+
+[node name="Button5" type="Button" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Torso/Extras"]
+layout_mode = 2
+text = "Shortened"
+
+[node name="Button6" type="Button" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Torso/Extras"]
+layout_mode = 2
+text = "Glowing"
+
+[node name="Button8" type="Button" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Torso/Extras"]
+layout_mode = 2
+text = "See-Through"
+
+[node name="Button9" type="Button" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Torso/Extras"]
+layout_mode = 2
+text = "Bushy Chest"
+
+[node name="Neckwear" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Torso"]
+visible = false
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Torso/Neckwear"]
+layout_mode = 2
+text = "Neckwear:"
+
+[node name="OptionButton" type="OptionButton" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Torso/Neckwear"]
+layout_mode = 2
+selected = 1
+item_count = 7
+popup/item_0/text = "None"
+popup/item_0/id = 0
+popup/item_1/text = "Choker"
+popup/item_1/id = 1
+popup/item_2/text = "Terran Dogtags"
+popup/item_2/id = 2
+popup/item_3/text = "Jaw Microphone"
+popup/item_3/id = 3
+popup/item_4/text = "Collar"
+popup/item_4/id = 4
+popup/item_5/text = "Tie"
+popup/item_5/id = 5
+popup/item_6/text = "Scarf"
+popup/item_6/id = 6
+
+[node name="Outfit" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Torso"]
+visible = false
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Torso/Outfit"]
+layout_mode = 2
+text = "Off-Duty Outfit:"
+
+[node name="OptionButton" type="OptionButton" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Torso/Outfit"]
+layout_mode = 2
+selected = 0
+item_count = 13
+popup/item_0/text = "Naked"
+popup/item_0/id = 0
+popup/item_1/text = "Oversized Shirt"
+popup/item_1/id = 1
+popup/item_2/text = "Sweater"
+popup/item_2/id = 2
+popup/item_3/text = "Combat Vest"
+popup/item_3/id = 3
+popup/item_4/text = "Seductress"
+popup/item_4/id = 4
+popup/item_5/text = "Plaid Shirt"
+popup/item_5/id = 5
+popup/item_6/text = "Leather Jacket"
+popup/item_6/id = 6
+popup/item_7/text = "Terran Formal"
+popup/item_7/id = 7
+popup/item_8/text = "Agarthian Formal"
+popup/item_8/id = 8
+popup/item_9/text = "Swimsuit"
+popup/item_9/id = 9
+popup/item_10/text = "Wetsuit"
+popup/item_10/id = 10
+popup/item_11/text = "Night Bra"
+popup/item_11/id = 11
+popup/item_12/text = "Sports Bra"
+popup/item_12/id = 12
+
+[node name="Arms" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion" instance=ExtResource("2_w27tf")]
+layout_mode = 2
+text = "Arms"
+
+[node name="Arm_Options" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Arms"]
+visible = false
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Arms/Arm_Options"]
+layout_mode = 2
+text = "Arm Type:"
+
+[node name="OptionButton" type="OptionButton" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Arms/Arm_Options"]
+layout_mode = 2
+selected = 0
+item_count = 2
+popup/item_0/text = "Normal"
+popup/item_0/id = 0
+popup/item_1/text = "Extra Long"
+popup/item_1/id = 1
+
+[node name="Hand_Options" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Arms"]
+visible = false
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Arms/Hand_Options"]
+layout_mode = 2
+text = "Hand Types:"
+
+[node name="OptionButton" type="OptionButton" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Arms/Hand_Options"]
+layout_mode = 2
+selected = 0
+item_count = 4
+popup/item_0/text = "Normal"
+popup/item_0/id = 0
+popup/item_1/text = "Claws"
+popup/item_1/id = 1
+popup/item_2/text = "Glowing"
+popup/item_2/id = 2
+popup/item_3/text = "Dual Thumb"
+popup/item_3/id = 3
+
+[node name="Handwear" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Arms"]
+visible = false
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Arms/Handwear"]
+layout_mode = 2
+text = "Hand Cover:
+"
+
+[node name="OptionButton" type="OptionButton" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Arms/Handwear"]
+layout_mode = 2
+selected = 2
+item_count = 3
+popup/item_0/text = "None"
+popup/item_0/id = 0
+popup/item_1/text = "Biker Gloves"
+popup/item_1/id = 1
+popup/item_2/text = "Fingerless Gloves"
+popup/item_2/id = 2
+
+[node name="Armwear" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Arms"]
+visible = false
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Arms/Armwear"]
+layout_mode = 2
+text = "Arm Cover:
+"
+
+[node name="OptionButton" type="OptionButton" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Arms/Armwear"]
+layout_mode = 2
+selected = 1
+item_count = 5
+popup/item_0/text = "None"
+popup/item_0/id = 0
+popup/item_1/text = "Silk Warmers"
+popup/item_1/id = 1
+popup/item_2/text = "Wool Warmers"
+popup/item_2/id = 2
+popup/item_3/text = "Sensor Cladding"
+popup/item_3/id = 3
+popup/item_4/text = "Watch"
+popup/item_4/id = 4
+
+[node name="Button7" type="CheckButton" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Arms"]
+visible = false
+layout_mode = 2
+text = "Extra Arms"
+
+[node name="Eyes" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion" instance=ExtResource("2_w27tf")]
+layout_mode = 2
+text = "Eyes & Ears"
+
+[node name="Eye Color" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Eyes"]
+visible = false
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Eyes/Eye Color"]
+layout_mode = 2
+text = "Eye Color:"
+
+[node name="OptionButton" type="OptionButton" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Eyes/Eye Color"]
+layout_mode = 2
+selected = 0
+item_count = 6
+popup/item_0/text = "Black"
+popup/item_0/id = 0
+popup/item_1/text = "Brown"
+popup/item_1/id = 1
+popup/item_2/text = "Blue"
+popup/item_2/id = 2
+popup/item_3/text = "Green"
+popup/item_3/id = 3
+popup/item_4/text = "Reptilian"
+popup/item_4/id = 4
+popup/item_5/text = "Heterochrome"
+popup/item_5/id = 5
+
+[node name="Glasses" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Eyes"]
+visible = false
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Eyes/Glasses"]
+layout_mode = 2
+text = "Eyewear:"
+
+[node name="OptionButton" type="OptionButton" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Eyes/Glasses"]
+layout_mode = 2
+selected = 0
+item_count = 4
+popup/item_0/text = "None"
+popup/item_0/id = 0
+popup/item_1/text = "Dark Shades"
+popup/item_1/id = 1
+popup/item_2/text = "Tactical Glasses"
+popup/item_2/id = 2
+popup/item_3/text = "Sports Glasses"
+popup/item_3/id = 3
+
+[node name="Ear Type" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Eyes"]
+visible = false
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Eyes/Ear Type"]
+layout_mode = 2
+text = "Ear Types:"
+
+[node name="OptionButton" type="OptionButton" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Eyes/Ear Type"]
+layout_mode = 2
+selected = 0
+item_count = 3
+popup/item_0/text = "Human Ears"
+popup/item_0/id = 2
+popup/item_1/text = "Cat Ears"
+popup/item_1/id = 0
+popup/item_2/text = "Elf Ears"
+popup/item_2/id = 1
+
+[node name="Earrings" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Eyes"]
+visible = false
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Eyes/Earrings"]
+layout_mode = 2
+text = "Earrings:"
+
+[node name="OptionButton" type="OptionButton" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Eyes/Earrings"]
+layout_mode = 2
+selected = 0
+item_count = 4
+popup/item_0/text = "None"
+popup/item_0/id = 2
+popup/item_1/text = "Big Rings"
+popup/item_1/id = 0
+popup/item_2/text = "Small Pearls"
+popup/item_2/id = 1
+popup/item_3/text = "Hanging"
+popup/item_3/id = 4
+
+[node name="HFlowContainer11" type="HFlowContainer" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Eyes"]
+visible = false
+layout_mode = 2
+
+[node name="Legs" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion" instance=ExtResource("2_w27tf")]
+layout_mode = 2
+text = "Legs & Hips"
+
+[node name="Volume" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Legs"]
+visible = false
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Legs/Volume"]
+layout_mode = 2
+text = "Volume:"
+
+[node name="OptionButton" type="OptionButton" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Legs/Volume"]
+layout_mode = 2
+selected = 1
+item_count = 4
+popup/item_0/text = "Average"
+popup/item_0/id = 0
+popup/item_1/text = "Muscular"
+popup/item_1/id = 1
+popup/item_2/text = "Slim"
+popup/item_2/id = 2
+popup/item_3/text = "Extra Thicc"
+popup/item_3/id = 3
+
+[node name="Pelvis" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Legs"]
+visible = false
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Legs/Pelvis"]
+layout_mode = 2
+text = "Pelvis:"
+
+[node name="OptionButton" type="OptionButton" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Legs/Pelvis"]
+layout_mode = 2
+selected = 0
+item_count = 3
+popup/item_0/text = "Normal"
+popup/item_0/id = 0
+popup/item_1/text = "Shortened"
+popup/item_1/id = 1
+popup/item_2/text = "Lengthned"
+popup/item_2/id = 2
+
+[node name="Outfit" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Legs"]
+visible = false
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Legs/Outfit"]
+layout_mode = 2
+text = "Off-Duty Outfit:"
+
+[node name="OptionButton" type="OptionButton" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Legs/Outfit"]
+layout_mode = 2
+selected = 0
+item_count = 18
+popup/item_0/text = "Naked"
+popup/item_0/id = 0
+popup/item_1/text = "Panties"
+popup/item_1/id = 1
+popup/item_2/text = "Men's Boxers"
+popup/item_2/id = 2
+popup/item_3/text = "Tight Shorts"
+popup/item_3/id = 3
+popup/item_4/text = "Short Jeans"
+popup/item_4/id = 4
+popup/item_5/text = "Small Skirt"
+popup/item_5/id = 5
+popup/item_6/text = "Long Skirt"
+popup/item_6/id = 6
+popup/item_7/text = "Standard Jeans"
+popup/item_7/id = 7
+popup/item_8/text = "Tattered Jeans"
+popup/item_8/id = 8
+popup/item_9/text = "Cargo Pants"
+popup/item_9/id = 9
+popup/item_10/text = "Gym Pants"
+popup/item_10/id = 10
+popup/item_11/text = "Yoga Pants"
+popup/item_11/id = 11
+popup/item_12/text = "Silk Stockings"
+popup/item_12/id = 12
+popup/item_13/text = "Wool Stockings"
+popup/item_13/id = 13
+popup/item_14/text = "Sensor Cladding"
+popup/item_14/id = 14
+popup/item_15/text = "Capris"
+popup/item_15/id = 15
+popup/item_16/text = "Formal Trousers"
+popup/item_16/id = 16
+popup/item_17/text = "Agarthian Skirt"
+popup/item_17/id = 17
+
+[node name="Breasts" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion" instance=ExtResource("2_w27tf")]
+layout_mode = 2
+text = "Breasts"
+
+[node name="Volume" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Breasts"]
+visible = false
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Breasts/Volume"]
+layout_mode = 2
+text = "Volume:"
+
+[node name="OptionButton" type="OptionButton" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Breasts/Volume"]
+layout_mode = 2
+selected = 1
+item_count = 3
+popup/item_0/text = "Small"
+popup/item_0/id = 0
+popup/item_1/text = "Medium"
+popup/item_1/id = 1
+popup/item_2/text = "Large"
+popup/item_2/id = 2
+
+[node name="Radius" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Breasts"]
+visible = false
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Breasts/Radius"]
+layout_mode = 2
+text = "Radius:"
+
+[node name="OptionButton" type="OptionButton" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Breasts/Radius"]
+layout_mode = 2
+selected = 2
+item_count = 3
+popup/item_0/text = "Small"
+popup/item_0/id = 0
+popup/item_1/text = "Medium"
+popup/item_1/id = 1
+popup/item_2/text = "Large"
+popup/item_2/id = 2
+
+[node name="Shape" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Breasts"]
+visible = false
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Breasts/Shape"]
+layout_mode = 2
+text = "Shape:"
+
+[node name="OptionButton" type="OptionButton" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Breasts/Shape"]
+layout_mode = 2
+selected = 0
+item_count = 4
+popup/item_0/text = "Flat Chested"
+popup/item_0/id = 0
+popup/item_1/text = "Conical"
+popup/item_1/id = 1
+popup/item_2/text = "Perky"
+popup/item_2/id = 2
+popup/item_3/text = "Volumptous"
+popup/item_3/id = 3
+
+[node name="Extras" type="HFlowContainer" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Breasts"]
+visible = false
+layout_mode = 2
+
+[node name="Button5" type="Button" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Breasts/Extras"]
+layout_mode = 2
+text = "Second Pair"
+
+[node name="Button6" type="Button" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Breasts/Extras"]
+layout_mode = 2
+text = "Third Boob"
+
+[node name="Button10" type="Button" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Breasts/Extras"]
+layout_mode = 2
+text = "Subsurface Glow"
+
+[node name="Button11" type="Button" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Breasts/Extras"]
+layout_mode = 2
+text = "Nipple Glow"
+
+[node name="Button12" type="Button" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Breasts/Extras"]
+layout_mode = 2
+text = "Ectoplasmic Ooze"
+
+[node name="Genitalia" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion" instance=ExtResource("2_w27tf")]
+layout_mode = 2
+text = "Genitalia"
+
+[node name="Type" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Genitalia"]
+visible = false
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Genitalia/Type"]
+layout_mode = 2
+text = "Type:"
+
+[node name="OptionButton" type="OptionButton" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Genitalia/Type"]
+layout_mode = 2
+selected = 0
+item_count = 4
+popup/item_0/text = "Tight Pussy"
+popup/item_0/id = 0
+popup/item_1/text = "Proeminent"
+popup/item_1/id = 1
+popup/item_2/text = "Stowed Tentabulge"
+popup/item_2/id = 2
+popup/item_3/text = "Extended Tentabulge"
+popup/item_3/id = 3
+
+[node name="Hair" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Genitalia"]
+visible = false
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Genitalia/Hair"]
+layout_mode = 2
+text = "Hairy:"
+
+[node name="OptionButton" type="OptionButton" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Genitalia/Hair"]
+layout_mode = 2
+selected = 0
+item_count = 4
+popup/item_0/text = "None"
+popup/item_0/id = 0
+popup/item_1/text = "Shaved"
+popup/item_1/id = 1
+popup/item_2/text = "Trimmed"
+popup/item_2/id = 2
+popup/item_3/text = "Bushy"
+popup/item_3/id = 3
+
+[node name="CheckButton" type="CheckButton" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Genitalia"]
+visible = false
+layout_mode = 2
+text = "Xenomorphed"
+
+[node name="Extras" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion" instance=ExtResource("2_w27tf")]
+layout_mode = 2
+text = "Extras"
+
+[node name="Tails" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Extras"]
+visible = false
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Extras/Tails"]
+layout_mode = 2
+text = "Tails:"
+
+[node name="OptionButton" type="OptionButton" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Extras/Tails"]
+layout_mode = 2
+selected = 0
+item_count = 9
+popup/item_0/text = "None"
+popup/item_0/id = 0
+popup/item_1/text = "Short Reptile"
+popup/item_1/id = 1
+popup/item_2/text = "Long Reptile"
+popup/item_2/id = 2
+popup/item_3/text = "Prehensile Tail"
+popup/item_3/id = 3
+popup/item_4/text = "Thick Prehensile Tail"
+popup/item_4/id = 4
+popup/item_5/text = "Fluffy Tail"
+popup/item_5/id = 5
+popup/item_6/text = "Bushy Tail"
+popup/item_6/id = 7
+popup/item_7/text = "Feline Tail"
+popup/item_7/id = 8
+popup/item_8/text = "Xenomorph"
+popup/item_8/id = 9
+
+[node name="CheckButton" type="CheckButton" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer2/Options/Accordion/Extras"]
+visible = false
+layout_mode = 2
+text = "Back Tentacles"
+
+[node name="Character Preview" type="SubViewportContainer" parent="MarginContainer/VBoxContainer/Contents"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="MarginContainer/VBoxContainer/Contents/Character Preview"]
+handle_input_locally = false
+size = Vector2i(669, 566)
+render_target_update_mode = 4
+
+[node name="Character" parent="MarginContainer/VBoxContainer/Contents/Character Preview/SubViewport" instance=ExtResource("4_qskii")]
+unique_name_in_owner = true
+transform = Transform3D(100, 0, 0, 0, 100, 0, 0, 0, 100, 0, 0, 0)
+
+[node name="Cam" type="Camera3D" parent="MarginContainer/VBoxContainer/Contents/Character Preview/SubViewport"]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 0.970842, 0.23972, 0, -0.23972, 0.970842, 0, 1.80321, 1.12154)
+fov = 55.0
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="MarginContainer/VBoxContainer/Contents/Character Preview/SubViewport/Cam"]
+light_color = Color(0.5527, 0.801262, 1, 1)
+light_energy = 0.5
+light_indirect_energy = 0.2
+directional_shadow_mode = 0
+directional_shadow_max_distance = 10.0
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="MarginContainer/VBoxContainer/Contents/Character Preview/SubViewport"]
+transform = Transform3D(1, 0, 0, 0, 0.388095, 0.92162, 0, -0.92162, 0.388095, 0, 2.56427, 1.03046)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/Contents"]
+layout_mode = 2
+mouse_filter = 0
+mouse_force_pass_scroll_events = false
+
+[node name="Dating_Sex" type="MenuButton" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer"]
+layout_mode = 2
+tooltip_text = "Perform Procedure, then date someone in the new form.
+
+Characters be asked to have sex. Usually, having sex with familiar characters doesn't grant benefits other than social bonding. But having sex with new people can be used to extract information from them and there's a chance you will absorb new genetic traits."
+text = "Initiate
+Face Time"
+flat = false
+item_count = 5
+popup/item_0/text = "Exfon Delta [Current Lover]"
+popup/item_0/id = 0
+popup/item_1/text = "Catherine Meyer"
+popup/item_1/id = 3
+popup/item_2/text = "Ethan Lennox"
+popup/item_2/id = 1
+popup/item_3/text = "Sven Moller [Busy]"
+popup/item_3/id = 2
+popup/item_3/disabled = true
+popup/item_4/text = "Unknown Agent [Interrogation]"
+popup/item_4/id = 4
+
+[node name="Background" type="MenuButton" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer"]
+layout_mode = 2
+tooltip_text = "Perform Procedure, then explore a part of the Warehouse facility in your new form."
+text = "Occupy
+Place"
+flat = false
+item_count = 8
+popup/item_0/text = "Personal Quarters"
+popup/item_0/id = 0
+popup/item_1/text = "Garden"
+popup/item_1/id = 1
+popup/item_2/text = "Briefing Room"
+popup/item_2/id = 2
+popup/item_3/text = "Buffet"
+popup/item_3/id = 3
+popup/item_4/text = "Loiter Tunnels"
+popup/item_4/id = 4
+popup/item_5/text = "Teleport Chamber"
+popup/item_5/id = 5
+popup/item_6/text = "Storage Room"
+popup/item_6/id = 6
+popup/item_7/text = "Recreational Gym"
+popup/item_7/id = 7
+
+[node name="Control" type="Control" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer"]
+layout_mode = 2
+text = "Preview Pose:"
+horizontal_alignment = 1
+
+[node name="Posing" type="OptionButton" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer"]
+layout_mode = 2
+tooltip_text = "Preview the new form in motion."
+selected = 0
+fit_to_longest_item = false
+item_count = 9
+popup/item_0/text = "Standing Up"
+popup/item_0/id = 0
+popup/item_1/text = "Wall Leaning"
+popup/item_1/id = 1
+popup/item_2/text = "Action"
+popup/item_2/id = 2
+popup/item_3/text = "Seductive"
+popup/item_3/id = 3
+popup/item_4/text = "Sexually Desperate"
+popup/item_4/id = 4
+popup/item_5/text = "Cross Legged"
+popup/item_5/id = 5
+popup/item_6/text = "On All Fours"
+popup/item_6/id = 6
+popup/item_7/text = "Victory"
+popup/item_7/id = 7
+popup/item_8/text = "Kneeling"
+popup/item_8/id = 8
+
+[node name="Control2" type="Control" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Cancel" type="Button" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer"]
+layout_mode = 2
+tooltip_text = "Perform Procedure and go back to the Main Menu."
+text = "Return 
+to Menu"
+
+[node name="Revert" type="Button" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer"]
+layout_mode = 2
+tooltip_text = "Stats are relative to the current form before entering costumization. Click here to clear these changes."
+text = "Reset
+Changes"
+
+[node name="Stats" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer/Stats"]
+layout_mode = 2
+text = "Health:
+Speed:
+Will:
+Lust: 
+Appeal:"
+horizontal_alignment = 2
+
+[node name="Label2" type="Label" parent="MarginContainer/VBoxContainer/Contents/VBoxContainer/Stats"]
+layout_mode = 2
+text = "4 -> 4
+6 -> 6
+6 -> 8
+3 -> 3
+4 -> 4"

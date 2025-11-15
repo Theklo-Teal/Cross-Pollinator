@@ -1,0 +1,220 @@
+[gd_scene load_steps=7 format=3 uid="uid://51a8e6fp1788"]
+
+[ext_resource type="PackedScene" uid="uid://ngoj4so74qwk" path="res://Levels/Freeroam/Template_Freeroam_Map.tscn" id="1_1wuc4"]
+[ext_resource type="PackedScene" uid="uid://hphw30iblb6d" path="res://Characters/Tactics/seigro_gamma.tscn" id="2_e8tfe"]
+[ext_resource type="Texture2D" uid="uid://dr6vmutb2v2gr" path="res://misc/textures/checkerboard.png" id="2_f3hqc"]
+[ext_resource type="PackedScene" uid="uid://dlk8yij7bqopc" path="res://Characters/Tactics/ethan_lennox.tscn" id="3_08qla"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_c7kbm"]
+albedo_texture = ExtResource("2_f3hqc")
+uv1_scale = Vector3(80, 80, 80)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yskrn"]
+transparency = 1
+albedo_color = Color(0.711219, 0.792982, 0.999999, 0.368627)
+
+[node name="Test_Map" instance=ExtResource("1_1wuc4")]
+
+[node name="Cam" parent="." index="0"]
+transform = Transform3D(-0.965926, 0, 0.258819, 0.129409, 0.866025, 0.482963, -0.224144, 0.5, -0.836516, 4, 1.35289, -31)
+
+[node name="OmniLight3D" type="OmniLight3D" parent="Environ/Lights" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 3, -35)
+omni_attenuation = 0.574349
+
+[node name="OmniLight3D2" type="OmniLight3D" parent="Environ/Lights" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 3, -35)
+omni_attenuation = 0.574349
+
+[node name="OmniLight3D9" type="OmniLight3D" parent="Environ/Lights" index="2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -29)
+omni_range = 7.0
+omni_attenuation = 0.574349
+
+[node name="OmniLight3D3" type="OmniLight3D" parent="Environ/Lights" index="3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 2, -32)
+omni_range = 7.0
+
+[node name="OmniLight3D4" type="OmniLight3D" parent="Environ/Lights" index="4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 2, 11)
+omni_range = 7.0
+
+[node name="OmniLight3D5" type="OmniLight3D" parent="Environ/Lights" index="5"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 2, 34)
+omni_range = 7.0
+
+[node name="OmniLight3D6" type="OmniLight3D" parent="Environ/Lights" index="6"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 2, 18)
+omni_range = 4.0
+
+[node name="OmniLight3D7" type="SpotLight3D" parent="Environ/Lights" index="7"]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 25, 3, -16)
+shadow_enabled = true
+spot_range = 18.653
+spot_attenuation = 0.5
+spot_angle = 34.3675
+
+[node name="OmniLight3D8" type="OmniLight3D" parent="Environ/Lights" index="8"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 36)
+light_color = Color(1, 0.505882, 0.227451, 1)
+omni_range = 8.0
+omni_attenuation = 0.535886
+
+[node name="Building" type="CSGCombiner3D" parent="Environ/Terrain" index="0"]
+
+[node name="Substrate" type="CSGBox3D" parent="Environ/Terrain/Building" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 1, 3)
+size = Vector3(50, 5, 83)
+material = SubResource("StandardMaterial3D_c7kbm")
+
+[node name="Hollows" type="CSGCombiner3D" parent="Environ/Terrain/Building" index="1"]
+operation = 2
+
+[node name="Hallway_1" type="CSGBox3D" parent="Environ/Terrain/Building/Hollows" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -1)
+size = Vector3(5.5, 4, 46)
+
+[node name="Airlock" type="CSGBox3D" parent="Environ/Terrain/Building/Hollows" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 25.5)
+size = Vector3(5.5, 4, 5)
+
+[node name="Hallway_2" type="CSGBox3D" parent="Environ/Terrain/Building/Hollows" index="2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.5, 2, 1.5)
+size = Vector3(5.5, 4, 77)
+
+[node name="XPoll" type="CSGCylinder3D" parent="Environ/Terrain/Building/Hollows" index="3"]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 0, 3, 36)
+radius = 7.0
+height = 6.0
+sides = 7
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="Environ/Terrain/Building/Hollows" index="4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.75, 2, 17.75)
+size = Vector3(8.5, 4, 6)
+
+[node name="Rec_Room" type="CSGBox3D" parent="Environ/Terrain/Building/Hollows" index="5"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.5, 2, 2.5)
+size = Vector3(22, 4, 23)
+
+[node name="Expedition_Room" type="CSGBox3D" parent="Environ/Terrain/Building/Hollows" index="6"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.5, 2, -16.25)
+size = Vector3(22, 4, 12)
+
+[node name="Onsen_Room" type="CSGBox3D" parent="Environ/Terrain/Building/Hollows" index="7"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 2, -31.25)
+size = Vector3(12, 4, 12)
+
+[node name="Onsen_Pool" type="CSGBox3D" parent="Environ/Terrain/Building/Hollows" index="8"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, -33.25)
+size = Vector3(5, 1, 8)
+
+[node name="Observ_Room" type="CSGBox3D" parent="Environ/Terrain/Building/Hollows" index="9"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 2, -31.25)
+size = Vector3(10, 4, 12)
+
+[node name="Command_Room" type="CSGBox3D" parent="Environ/Terrain/Building/Hollows" index="10"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.5, 2, 10.75)
+size = Vector3(13, 4, 12)
+
+[node name="Control_Room" type="CSGBox3D" parent="Environ/Terrain/Building/Hollows" index="11"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13, 2, 29.25)
+size = Vector3(6, 4, 23)
+
+[node name="Doorways" type="CSGCombiner3D" parent="Environ/Terrain/Building" index="2"]
+operation = 2
+
+[node name="Airlock_Door" type="CSGBox3D" parent="Environ/Terrain/Building/Doorways" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 26)
+size = Vector3(3, 2, 9)
+
+[node name="Locker_Door" type="CSGBox3D" parent="Environ/Terrain/Building/Doorways" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1, 18)
+size = Vector3(1, 2, 1)
+
+[node name="Gym_Door" type="CSGBox3D" parent="Environ/Terrain/Building/Doorways" index="2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1, 10.5)
+size = Vector3(8, 2, 2)
+
+[node name="Rail_Door" type="CSGBox3D" parent="Environ/Terrain/Building/Doorways" index="3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1, -15.5)
+size = Vector3(1, 2, 3)
+
+[node name="Onsen_Door" type="CSGBox3D" parent="Environ/Terrain/Building/Doorways" index="4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -24.5)
+size = Vector3(3, 2, 1)
+
+[node name="Observ_Door" type="CSGBox3D" parent="Environ/Terrain/Building/Doorways" index="5"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.5, 1, -30.5)
+size = Vector3(2, 2, 2)
+
+[node name="Command_Door" type="CSGBox3D" parent="Environ/Terrain/Building/Doorways" index="6"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.5, 1, 10.5)
+size = Vector3(2, 2, 2)
+
+[node name="Control_Door" type="CSGBox3D" parent="Environ/Terrain/Building/Doorways" index="7"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.5, 1, 32.5)
+size = Vector3(2, 2, 2)
+
+[node name="Onsen_Door2" type="CSGBox3D" parent="Environ/Terrain/Building/Doorways" index="8"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -24.75)
+size = Vector3(3, 2, 1)
+
+[node name="Expedition_Room" type="CSGCombiner3D" parent="Environ/Terrain" index="1"]
+
+[node name="Orgone_Reactor" type="CSGCombiner3D" parent="Environ/Terrain/Expedition_Room" index="0"]
+
+[node name="CSGSphere3D" type="CSGSphere3D" parent="Environ/Terrain/Expedition_Room/Orgone_Reactor" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 1, -20)
+radius = 2.0
+
+[node name="CSGCylinder3D" type="CSGCylinder3D" parent="Environ/Terrain/Expedition_Room/Orgone_Reactor" index="1"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 14, 1, -20)
+radius = 1.2
+height = 8.0
+
+[node name="Cart" type="CSGCombiner3D" parent="Environ/Terrain/Expedition_Room" index="1"]
+
+[node name="CSGBox3D" type="CSGBox3D" parent="Environ/Terrain/Expedition_Room/Cart" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.5, 1, -12.5)
+size = Vector3(4, 1.4, 2)
+
+[node name="CSGCylinder3D" type="CSGCylinder3D" parent="Environ/Terrain/Expedition_Room/Cart" index="1"]
+transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, 17.5, 1, -12.5)
+operation = 1
+radius = 1.0
+height = 4.0
+sides = 10
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="Environ/Terrain/Expedition_Room/Cart" index="2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 1.25, -12.5)
+operation = 2
+size = Vector3(2.5, 1.4, 2)
+
+[node name="Onsen_Room" type="CSGCombiner3D" parent="Environ/Terrain" index="2"]
+
+[node name="CSGBox3D4" type="CSGBox3D" parent="Environ/Terrain/Onsen_Room" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -36)
+size = Vector3(5, 4, 3)
+
+[node name="CSGBox3D5" type="CSGBox3D" parent="Environ/Terrain/Onsen_Room" index="1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -35.5)
+operation = 2
+size = Vector3(3, 3, 2)
+
+[node name="Observ_Room" type="CSGCombiner3D" parent="Environ/Terrain" index="3"]
+
+[node name="Window" type="CSGBox3D" parent="Environ/Terrain/Observ_Room" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 1.5, -31.25)
+size = Vector3(0.25, 4, 13)
+material = SubResource("StandardMaterial3D_yskrn")
+
+[node name="seibra_gamma" parent="Teams/Allies" index="0" instance=ExtResource("2_e8tfe")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -32)
+
+[node name="ethan_lennox" parent="Teams/Other" index="0" instance=ExtResource("3_08qla")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 33)
+
+[node name="Player_UI" parent="." index="4"]
+location_name = "Onsen Garden"
+path_name = PackedStringArray("Seibra Quarters", "Cross Polinator", "Control Room", "Expedition Room", "Locker Room")
+path_color = PackedColorArray(0.603922, 0.172549, 0.615686, 1, 0.231538, 0.356313, 0.638166, 1, 0.443137, 0, 0, 1, 0, 0.4, 0, 1, 0.921569, 0.427451, 0.188235, 1)

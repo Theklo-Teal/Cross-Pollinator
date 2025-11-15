@@ -1,0 +1,532 @@
+[gd_scene load_steps=8 format=3 uid="uid://cwlix8svgd2g4"]
+
+[sub_resource type="GDScript" id="GDScript_0n2tj"]
+resource_name = "main"
+script/source = "extends Node
+
+func _ready() -> void:
+	%grid_width.value = %grid.hei
+	%grid_height.value = %grid.hei
+	%cell_size.value = %grid.cell
+	
+	%Sel_Algo.clear()
+	var idx = 0
+	for each in %grid.get_children():
+		%Sel_Algo.add_item(each.name)
+		%Sel_Algo.set_item_metadata(idx, each)
+		idx += 1
+
+
+func _on_grid_obstacle_kind_changed(kind: int) -> void:
+	const obst := [
+		\"EMPTY\",
+		\"HALF\",
+		\"FULL\"
+	]
+	%Obstacle.text = obst[kind]
+
+
+func _on_run_travel_pressed() -> void:
+	var sel = %Sel_Algo.selected
+	var algo = %Sel_Algo.get_item_metadata(sel)
+	
+	var from = %grid.from
+	var to = %grid.to
+	var obstacles = %grid.obstacles
+	
+	algo.final_solution()
+
+
+func _on_run_reset_pressed() -> void:
+	%grid.traject.clear()
+	%grid.queue_redraw()
+
+
+func _on_sel_algo_item_selected(index: int) -> void:
+	for each in %Algo_Opts.get_children():
+		each.queue_free()
+	
+	var sel = %Sel_Algo.selected
+	var algo = %Sel_Algo.get_item_metadata(sel)
+	for each in algo.get_opts():
+		%Algo_Opts.add_child(each)
+"
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xq6mc"]
+bg_color = Color(0.180392, 0.180392, 0.180392, 1)
+
+[sub_resource type="GDScript" id="GDScript_7syh7"]
+resource_name = "grid"
+script/source = "extends ColorRect
+
+signal obstacle_kind_changed(kind:int)
+
+@export var wid : int = 10
+@export var hei : int = 10
+@export var cell : int = 50
+
+@export var from : Vector2i
+@export var to : Vector2i
+@export var obstacles : Dictionary
+
+var traject : Array[Vector2i]
+var sel_obst : OBST
+
+enum OBST{
+	EMPTY,
+	HALF,
+	FULL
+}
+
+var obst_color = [
+	color,
+	Color.DIM_GRAY,
+	Color.DARK_GRAY,
+]
+
+func _draw() -> void:
+	var cell_offset := Vector2.ONE * cell * 0.5
+	
+	# Draw grid
+	for x in range(wid + 1):
+		for y in range(hei + 1):
+			var h_start := Vector2(0, y * cell)
+			var h_end := Vector2(size.x, y * cell)
+			draw_line(h_start, h_end, Color.DARK_GRAY)
+			
+			var v_start := Vector2(x * cell, 0)
+			var v_end := Vector2(x * cell, size.y)
+			draw_line(v_start, v_end, Color.DARK_GRAY)
+	
+	# Draw obstacles
+	for coord : Vector2i in obstacles:
+		var rect := Rect2(coord * cell, Vector2.ONE * cell - Vector2.ONE)
+		draw_rect(rect, obst_color[obstacles[coord]])
+	
+	# Draw markers
+	draw_circle(Vector2(from * cell) + cell_offset, cell * 0.4, Color.STEEL_BLUE)
+	draw_circle(Vector2(to * cell) + cell_offset, cell * 0.4, Color.CORAL)
+	
+	# Draw trajectory
+	for coord : Vector2i in traject:
+		var rect := Rect2(Vector2(coord * cell) + (cell_offset - Vector2.ONE * cell * 0.15), Vector2.ONE * cell * 0.3 - Vector2.ONE)
+		draw_rect(rect, Color.YELLOW_GREEN)
+
+func _gui_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.is_released():
+		match event.button_index:
+			MOUSE_BUTTON_LEFT:
+				from.x = remap(event.position.x, 0, cell*wid, 0, wid)
+				from.y = remap(event.position.y, 0, cell*hei, 0, hei)
+				queue_redraw()
+			MOUSE_BUTTON_RIGHT:
+				to.x = remap(event.position.x, 0, cell*wid, 0, wid)
+				to.y = remap(event.position.y, 0, cell*hei, 0, hei)
+				queue_redraw()
+			MOUSE_BUTTON_MIDDLE:
+				var coord : Vector2i
+				coord.x = remap(event.position.x, 0, cell*wid, 0, wid)
+				coord.y = remap(event.position.y, 0, cell*hei, 0, hei)
+				if sel_obst == OBST.EMPTY:
+					obstacles.erase(coord)
+				else:
+					obstacles[coord] = sel_obst
+				queue_redraw()
+			MOUSE_BUTTON_WHEEL_DOWN:
+				sel_obst = wrapi(sel_obst - 1, 0, 3)
+				obstacle_kind_changed.emit(sel_obst)
+			MOUSE_BUTTON_WHEEL_UP:
+				sel_obst = wrapi(sel_obst + 1, 0, 3)
+				obstacle_kind_changed.emit(sel_obst)
+
+
+
+func _on_grid_width_value_changed(value: float) -> void:
+	wid = value
+	queue_redraw()
+
+func _on_grid_height_value_changed(value: float) -> void:
+	hei = value
+	queue_redraw()
+
+func _on_cell_size_value_changed(value: float) -> void:
+	cell = value
+	queue_redraw()
+"
+
+[sub_resource type="GDScript" id="GDScript_i8se7"]
+script/source = "extends Node
+
+func get_opts() -> Array[Control]:
+	return []
+
+func final_solution():
+	var r : int = get_parent().from.distance_to(get_parent().to)
+	var c : Vector2i = get_parent().from
+	
+	var x : int = 0
+	var y : int = -r
+	var p : int = -r
+	#circumference(c,x,y,p)
+	filled_circle(c,r)
+	get_parent().queue_redraw()
+
+
+func circumference(c, x, y, p):
+	while x < -y:
+		if p > 0:
+			y+=1
+			p += 2 * (x+y) + 1
+		else:
+			p += 2 * x + 1
+			
+		var octants : Array[Vector2i] = [
+			Vector2i( c.x + x, c.y + y),
+			Vector2i( c.x - x, c.y + y),
+			Vector2i( c.x + x, c.y - y),
+			Vector2i( c.x - x, c.y - y),
+			Vector2i( c.x + y, c.y + x),
+			Vector2i( c.x - y, c.y + x),
+			Vector2i( c.x + y, c.y - x),
+			Vector2i( c.x - y, c.y - x),
+			]
+		x += 1
+	
+		get_parent().traject += octants
+
+
+func filled_circle(c, r):
+	var edge : Dictionary
+	
+	var x : int = 0
+	var y : int = -r
+	var p : int = -r
+	
+	while x < -y:
+		if p > 0:
+			y+=1
+			p += 2 * (x+y) + 1
+		else:
+			p += 2 * x + 1
+		
+		# All octants that make the right half a circle
+		edge[y] = max(edge.get(y, 0), x)
+		edge[-y] = max(edge.get(-y, 0), x)
+		edge[x] = max(edge.get(x, 0), -y)
+		edge[-x] = max(edge.get(-x, 0), -y)
+		
+		x += 1
+	
+	for Y in edge:
+		for X in range(-edge[Y], edge[Y] + 1):
+			get_parent().traject.append( Vector2i(X, Y) + c )
+"
+
+[sub_resource type="GDScript" id="GDScript_nhpbq"]
+script/source = "extends Node
+
+func get_opts() -> Array[Control]:
+	return []
+
+func final_solution():
+	lerp_solution()
+	get_parent().queue_redraw()
+
+
+func experimental_solution():
+	var start : Vector2i = get_parent().from
+	var stop : Vector2i = get_parent().to
+	var delta : Vector2i = start - stop
+	var M = delta.y / delta.x
+	for x in range( start.x, stop.x + 1 ):
+		var cursor = Vector2i( x, roundi( x * M ) )
+		get_parent().traject.append(cursor)
+
+
+func lerp_solution():
+	var start : Vector2i = get_parent().from
+	var stop : Vector2i = get_parent().to
+	var delta : Vector2i = start - stop
+	var N = max(abs(delta.x), abs(delta.y))
+	for n in range(N + 1):
+		var t = float(n) / float(N)
+		var cursor = Vector2i( roundi(lerp(start.x, stop.x, t)), roundi(lerp(start.y, stop.y, t)) )
+		get_parent().traject.append(cursor)
+"
+
+[sub_resource type="GDScript" id="GDScript_ib8dd"]
+script/source = "extends Node
+
+const turn = [
+	Vector2i(1,0),
+	Vector2i(0,1),
+	Vector2i(-1,0),
+	Vector2i(0,-1),
+	]
+
+func get_opts() -> Array[Control]:
+	return []
+
+func final_solution():
+	var cursor : Vector2i = get_parent().from
+	var steps : int
+	var check : Vector2i
+	var dir : int 
+	while steps < get_parent().wid * get_parent().hei:
+		steps += 1
+		var solved = false
+		for attempt in range(turn.size()):
+			check = cursor + turn[dir]
+			var tests = [check.x > get_parent().wid - 1,
+						check.y > get_parent().hei - 1,
+						check.x < 0,
+						check.y < 0,
+						check in get_parent().obstacles]
+			
+			if not true in tests:
+				solved = true
+				break
+			else:
+				dir = wrapi(dir + 1, 0, 4)
+		if solved:
+			cursor = check
+			if cursor == get_parent().to:
+				print(\"MAZE SOLVED\")
+				break
+			get_parent().traject.append(cursor)
+		else:
+			print(\"MAZE SOLUTION NOT FOUND\")
+			break
+	get_parent().queue_redraw()
+"
+
+[sub_resource type="GDScript" id="GDScript_rklog"]
+script/source = "extends Node
+
+func get_opts() -> Array[Control]:
+	var ui : Array[Control]
+	var elem : Control
+	
+	elem = CheckButton.new()
+	elem.text = \"Travel Diagonally\"
+	ui.append(elem)
+	
+	elem = Label.new()
+	elem.text = \"Heuristic:\"
+	ui.append(elem)
+	
+	elem = OptionButton.new()
+	elem.add_item(\"Euclidian\")
+	elem.add_item(\"Manhattan\")
+	elem.add_item(\"Octile\")
+	ui.append(elem)
+	
+	return ui
+
+
+func final_solution():
+	var astar := AStarGrid2D.new()
+	astar.region = Rect2i(Vector2i.ZERO, Vector2i(get_parent().wid,get_parent().hei))
+	astar.update()
+	for coord in get_parent().obstacles:
+		#var kind = get_parent().obstacles[coord]
+		astar.set_point_solid(coord)
+	get_parent().traject = astar.get_id_path(get_parent().from, get_parent().to)
+	get_parent().queue_redraw()
+"
+
+[node name="Pathfinding" type="Node"]
+script = SubResource("GDScript_0n2tj")
+
+[node name="Timer" type="Timer" parent="."]
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="Left_Bar" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer/Left_Bar"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/Left_Bar/HBoxContainer"]
+layout_mode = 2
+text = "X Size:"
+
+[node name="spacer" type="Control" parent="MarginContainer/HBoxContainer/Left_Bar/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="grid_width" type="SpinBox" parent="MarginContainer/HBoxContainer/Left_Bar/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 1.0
+max_value = 500.0
+page = 10.0
+value = 1.0
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/HBoxContainer/Left_Bar"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/Left_Bar/HBoxContainer2"]
+layout_mode = 2
+text = "Y Size:"
+
+[node name="spacer" type="Control" parent="MarginContainer/HBoxContainer/Left_Bar/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="grid_height" type="SpinBox" parent="MarginContainer/HBoxContainer/Left_Bar/HBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 1.0
+max_value = 500.0
+page = 10.0
+value = 1.0
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="MarginContainer/HBoxContainer/Left_Bar"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/Left_Bar/HBoxContainer3"]
+layout_mode = 2
+text = "Cell Size:"
+
+[node name="spacer" type="Control" parent="MarginContainer/HBoxContainer/Left_Bar/HBoxContainer3"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="cell_size" type="SpinBox" parent="MarginContainer/HBoxContainer/Left_Bar/HBoxContainer3"]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 1.0
+page = 10.0
+value = 1.0
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/HBoxContainer/Left_Bar"]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="MarginContainer/HBoxContainer/Left_Bar"]
+layout_mode = 2
+text = "Selected Obstacle:"
+
+[node name="Obstacle" type="Label" parent="MarginContainer/HBoxContainer/Left_Bar"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_xq6mc")
+text = "Empty"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HSeparator2" type="HSeparator" parent="MarginContainer/HBoxContainer/Left_Bar"]
+layout_mode = 2
+
+[node name="Label3" type="Label" parent="MarginContainer/HBoxContainer/Left_Bar"]
+layout_mode = 2
+text = "Maze Algorithm:"
+
+[node name="Maze_Algo" type="OptionButton" parent="MarginContainer/HBoxContainer/Left_Bar"]
+layout_mode = 2
+disabled = true
+
+[node name="Button" type="Button" parent="MarginContainer/HBoxContainer/Left_Bar"]
+layout_mode = 2
+disabled = true
+text = "Generate Maze"
+
+[node name="grid" type="ColorRect" parent="MarginContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.190762, 0.190762, 0.190762, 1)
+script = SubResource("GDScript_7syh7")
+wid = 20
+hei = 20
+cell = 30
+from = Vector2i(9, 9)
+to = Vector2i(16, 9)
+
+[node name="Midpoint_Circle" type="Node" parent="MarginContainer/HBoxContainer/grid"]
+script = SubResource("GDScript_i8se7")
+
+[node name="Bresenham_Line" type="Node" parent="MarginContainer/HBoxContainer/grid"]
+script = SubResource("GDScript_nhpbq")
+
+[node name="Headbutt_Right" type="Node" parent="MarginContainer/HBoxContainer/grid"]
+script = SubResource("GDScript_ib8dd")
+
+[node name="A-Star" type="Node" parent="MarginContainer/HBoxContainer/grid"]
+script = SubResource("GDScript_rklog")
+
+[node name="Right_Bar" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="HBoxContainer4" type="HBoxContainer" parent="MarginContainer/HBoxContainer/Right_Bar"]
+layout_mode = 2
+
+[node name="run_reset" type="Button" parent="MarginContainer/HBoxContainer/Right_Bar/HBoxContainer4"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "RESET"
+
+[node name="run_travel" type="Button" parent="MarginContainer/HBoxContainer/Right_Bar/HBoxContainer4"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "TRAVEL"
+
+[node name="laziness" type="CheckButton" parent="MarginContainer/HBoxContainer/Right_Bar"]
+layout_mode = 2
+tooltip_text = "Will avoid half obstacles."
+text = "Lazy Travel:"
+
+[node name="slowness" type="CheckButton" parent="MarginContainer/HBoxContainer/Right_Bar"]
+layout_mode = 2
+tooltip_text = "Will show animation of the path instead of instantanteous solution."
+text = "Step-By-Step:"
+
+[node name="inquisive" type="CheckButton" parent="MarginContainer/HBoxContainer/Right_Bar"]
+layout_mode = 2
+tooltip_text = "Will show all the steps that were checked, but not crossed."
+text = "Show Checks"
+
+[node name="HSeparator2" type="HSeparator" parent="MarginContainer/HBoxContainer/Right_Bar"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/Right_Bar"]
+layout_mode = 2
+text = "Search Algorithm:"
+
+[node name="Sel_Algo" type="OptionButton" parent="MarginContainer/HBoxContainer/Right_Bar"]
+unique_name_in_owner = true
+layout_mode = 2
+selected = 0
+item_count = 1
+popup/item_0/text = "Hit_Turn_Right"
+
+[node name="Algo_Opts_Scroller" type="ScrollContainer" parent="MarginContainer/HBoxContainer/Right_Bar"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Algo_Opts" type="VBoxContainer" parent="MarginContainer/HBoxContainer/Right_Bar/Algo_Opts_Scroller"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[connection signal="value_changed" from="MarginContainer/HBoxContainer/Left_Bar/HBoxContainer/grid_width" to="MarginContainer/HBoxContainer/grid" method="_on_grid_width_value_changed"]
+[connection signal="value_changed" from="MarginContainer/HBoxContainer/Left_Bar/HBoxContainer2/grid_height" to="MarginContainer/HBoxContainer/grid" method="_on_grid_height_value_changed"]
+[connection signal="value_changed" from="MarginContainer/HBoxContainer/Left_Bar/HBoxContainer3/cell_size" to="MarginContainer/HBoxContainer/grid" method="_on_cell_size_value_changed"]
+[connection signal="obstacle_kind_changed" from="MarginContainer/HBoxContainer/grid" to="." method="_on_grid_obstacle_kind_changed"]
+[connection signal="pressed" from="MarginContainer/HBoxContainer/Right_Bar/HBoxContainer4/run_reset" to="." method="_on_run_reset_pressed"]
+[connection signal="pressed" from="MarginContainer/HBoxContainer/Right_Bar/HBoxContainer4/run_travel" to="." method="_on_run_travel_pressed"]
+[connection signal="item_selected" from="MarginContainer/HBoxContainer/Right_Bar/Sel_Algo" to="." method="_on_sel_algo_item_selected"]

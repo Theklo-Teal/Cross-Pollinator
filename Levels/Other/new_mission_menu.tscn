@@ -1,0 +1,495 @@
+[gd_scene load_steps=17 format=3 uid="uid://crld8nl2j8yid"]
+
+[ext_resource type="AudioStream" uid="uid://biolhqs64or4g" path="res://Assets/Music/Unlicensed/Men In Black (The Series) Intro Theme.mp3" id="1_1h34u"]
+[ext_resource type="PackedScene" uid="uid://h57pekvr0n5q" path="res://Characters/Assets/ethan_lennox/Soldier.glb" id="1_qxil5"]
+[ext_resource type="PackedScene" uid="uid://bwv1p7d4xk7nw" path="res://Characters/Assets/seigro_gamma/FemaleFighter.glb" id="2_u4cwc"]
+[ext_resource type="Texture2D" uid="uid://d350bts75adn3" path="res://Assets/Textures/character_info.tres" id="3_veh32"]
+[ext_resource type="Texture2D" uid="uid://dl01gru4elcqu" path="res://Assets/Textures/character_info.png" id="4_4k6uo"]
+
+[sub_resource type="GDScript" id="GDScript_rc11s"]
+script/source = "extends Node
+
+const chara_descript = [
+	\"[center] Select a charater as the protagonist of the story.
+You will be receiving the story in the perspective of this character, by the point they enter the overall narrative.
+A character that enters later in the story will also make available to you later progress equipment and perks, but you will miss collectibles, cutscenes and lore entries of earlier parts of the story.
+[/center]\",
+	\"[center]Formerly a special forces operator, he decided to retire early, enabling the Warehouse to hire him. He is an expert in sabotage and demolitions. Prone to one-liner quips at innappropriate times, tho.[/center]\",
+	\"[center]As an elite Agarthian exosuit pilot, Seigro enjoys sports vehicles and big guns, but can still be quite imposing without them. Might be overly confident in her ability to succeed on a mission, but when you have survived to be 18'000 years old, who wouldn't?[/center]\",
+]
+
+
+enum chara {
+	NONE,
+	ETHAN_LENNOX,
+	SEIGRO_GAMMA,
+}
+
+var chara_hover : chara
+
+
+func _ready() -> void:
+	unselect_chara()
+	for each in $Protagonists.get_children():
+		each.get_node(\"model/AnimationPlayer\").play(\"Idle\")
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.is_pressed() and event.button_index == MOUSE_BUTTON_LEFT:
+		#get_tree().change_scene_to_file()
+		print(\"Clicked on \", $Protagonists.get_child(chara_hover - 1).name)
+
+func hide_all_lights():
+	for each in $Protagonists.get_children():
+		each.get_node(\"Front_Light\").hide()
+
+func unselect_chara():
+	select_chara(chara.NONE)
+
+func select_chara(who:chara):
+	hide_all_lights()
+	chara_hover = who
+	%Description.text = chara_descript[who]
+
+func _on_ethan_lennox_mouse_entered() -> void:
+	select_chara(chara.ETHAN_LENNOX)
+	$Protagonists/ethan_lennox/Front_Light.show()
+
+func _on_seigro_gamma_mouse_entered() -> void:
+	select_chara(chara.SEIGRO_GAMMA)
+	$Protagonists/seigro_gamma/Front_Light.show()
+"
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_ebow2"]
+height = 1.7
+
+[sub_resource type="Gradient" id="Gradient_gxifx"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0.235294, 0.720588, 1)
+colors = PackedColorArray(0.227451, 0.227451, 0.227451, 1, 0.227451, 0.227451, 0.227451, 0.784314, 0.227451, 0.227451, 0.227451, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_kbdhy"]
+gradient = SubResource("Gradient_gxifx")
+width = 128
+height = 128
+fill_from = Vector2(0.5, 1)
+fill_to = Vector2(0.5, 0)
+metadata/_snap_enabled = true
+
+[sub_resource type="LabelSettings" id="LabelSettings_yd432"]
+font_size = 42
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8bcww"]
+atlas = ExtResource("4_4k6uo")
+region = Rect2(640, 512, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7d0k5"]
+atlas = ExtResource("4_4k6uo")
+region = Rect2(0, 128, 128, 128)
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_qyj34"]
+load_path = "res://.godot/imported/character_info.png-0d691658f075c9109a18b0c112f94ac2.s3tc.ctex"
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8ct4g"]
+atlas = SubResource("CompressedTexture2D_qyj34")
+region = Rect2(128, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7dx12"]
+atlas = ExtResource("4_4k6uo")
+region = Rect2(640, 128, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bhfcp"]
+atlas = ExtResource("4_4k6uo")
+region = Rect2(0, 0, 128, 128)
+
+[node name="NewMissionMenu" type="Node"]
+script = SubResource("GDScript_rc11s")
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("1_1h34u")
+volume_db = 3.0
+autoplay = true
+parameters/looping = true
+
+[node name="Cam" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 3)
+fov = 50.0
+
+[node name="Protagonists" type="Node3D" parent="."]
+
+[node name="ethan_lennox" type="Node3D" parent="Protagonists"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.920669, 0, 0)
+
+[node name="model" parent="Protagonists/ethan_lennox" instance=ExtResource("1_qxil5")]
+
+[node name="Skeleton3D" parent="Protagonists/ethan_lennox/model/Armature" index="0"]
+bones/0/position = Vector3(0.0420516, -0.0322342, -1.07057)
+bones/0/rotation = Quaternion(-0.7273, -0.00466287, -0.0304076, 0.68563)
+bones/1/rotation = Quaternion(-0.026258, 0.00139989, 0.00800825, 0.999622)
+bones/2/rotation = Quaternion(0.0317051, 0.0101131, 0.0259981, 0.999108)
+bones/3/rotation = Quaternion(0.0309235, 0.0141573, 0.0246945, 0.999116)
+bones/4/rotation = Quaternion(0.0483221, 0.0863672, -0.0104537, 0.995036)
+bones/5/rotation = Quaternion(0.000650017, 0.0891568, -0.0549726, 0.994499)
+bones/7/rotation = Quaternion(-0.548281, -0.444064, 0.558079, -0.436741)
+bones/8/rotation = Quaternion(0.501517, 0.188084, 0.141561, 0.832506)
+bones/9/rotation = Quaternion(-0.00465452, -0.0362815, 0.171343, 0.984532)
+bones/10/rotation = Quaternion(-0.0301465, -0.219057, 0.02365, 0.974959)
+bones/11/rotation = Quaternion(0.123786, 0.205469, 0.273345, 0.931527)
+bones/12/rotation = Quaternion(0.0360747, -0.17237, -0.323187, 0.929805)
+bones/13/rotation = Quaternion(-0.000814638, -0.0824781, -0.00760683, 0.996564)
+bones/15/rotation = Quaternion(0.0769268, 0.016132, -0.0188803, 0.996727)
+bones/16/rotation = Quaternion(0.166761, -0.0219386, -0.0203322, 0.985544)
+bones/17/rotation = Quaternion(0.129369, -0.0206051, -0.0337836, 0.990807)
+bones/19/rotation = Quaternion(0.569005, -0.422259, 0.551615, 0.440058)
+bones/20/rotation = Quaternion(0.498464, -0.0164144, 0.0652355, 0.864297)
+bones/21/rotation = Quaternion(0.0116529, 0.116664, -0.169434, 0.978543)
+bones/22/rotation = Quaternion(0.0253107, 0.0333906, 0.0969102, 0.994411)
+bones/23/rotation = Quaternion(0.139752, -0.22027, -0.240325, 0.934984)
+bones/24/rotation = Quaternion(-0.0343421, 0.208963, 0.327208, 0.920918)
+bones/25/rotation = Quaternion(0.0118578, 0.0798839, -0.0529343, 0.995327)
+bones/27/rotation = Quaternion(0.0261185, -0.0237496, 0.0997679, 0.994384)
+bones/28/rotation = Quaternion(0.233261, 0.0354105, 0.00190054, 0.971767)
+bones/29/rotation = Quaternion(0.162578, 0.0236683, 0.0438391, 0.985437)
+bones/31/rotation = Quaternion(0.12309, 0.126719, 0.981202, -0.0776718)
+bones/32/rotation = Quaternion(-0.23411, -0.0845359, 0.0039488, 0.96852)
+bones/33/rotation = Quaternion(0.52072, -0.0436825, 0.0152296, 0.852473)
+bones/34/rotation = Quaternion(0.34372, -0.0543147, 0.0194442, 0.937299)
+bones/36/rotation = Quaternion(-0.030784, 0.0176754, 0.999351, 0.00618732)
+bones/37/rotation = Quaternion(-0.182089, 0.043906, 0.0454788, 0.981248)
+bones/38/rotation = Quaternion(0.567159, 0.0164414, -0.0421773, 0.822364)
+bones/39/rotation = Quaternion(0.350231, 0.051947, -0.018888, 0.935031)
+
+[node name="Front_Light" type="SpotLight3D" parent="Protagonists/ethan_lennox"]
+transform = Transform3D(1, 0, 0, 0, 0.258819, -0.965926, 0, 0.965926, 0.258819, 0, -0.768836, 0.544734)
+visible = false
+spot_attenuation = 0.08
+spot_angle = 13.4862
+
+[node name="Top_Light" type="SpotLight3D" parent="Protagonists/ethan_lennox"]
+transform = Transform3D(0.745246, 0.170266, 0.644684, -0.158664, -0.893794, 0.419473, 0.647637, -0.414899, -0.639082, 1.03017, 2.11472, -0.905459)
+spot_range = 3.02406
+spot_attenuation = 0.08
+spot_angle = 23.8825
+
+[node name="Area3D" type="Area3D" parent="Protagonists/ethan_lennox"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Protagonists/ethan_lennox/Area3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CylinderShape3D_ebow2")
+
+[node name="seigro_gamma" type="Node3D" parent="Protagonists"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.904649, 0, 0)
+
+[node name="model" parent="Protagonists/seigro_gamma" instance=ExtResource("2_u4cwc")]
+
+[node name="Skeleton3D" parent="Protagonists/seigro_gamma/model/Armature_001" index="0"]
+bones/0/position = Vector3(0.0118039, 0.010335, -1.06898)
+bones/0/rotation = Quaternion(-0.737605, -0.0688697, -0.0126557, 0.671592)
+bones/1/rotation = Quaternion(0.0206525, -0.00198844, 0.078823, 0.996673)
+bones/2/rotation = Quaternion(0.00253076, -0.00407311, -0.00613672, 0.99997)
+bones/3/rotation = Quaternion(0.00243079, -0.00339035, -0.00583023, 0.999974)
+bones/4/rotation = Quaternion(0.0369119, -0.000781559, -0.00996771, 0.999269)
+bones/5/rotation = Quaternion(-0.107623, -0.000240659, 0.0115417, 0.994125)
+bones/7/rotation = Quaternion(-0.608591, -0.387057, 0.553713, -0.41618)
+bones/8/rotation = Quaternion(0.491347, 0.046343, 0.030323, 0.869201)
+bones/9/rotation = Quaternion(0.00466075, 0.0195306, 0.169449, 0.985334)
+bones/10/rotation = Quaternion(0.104078, 0.21534, -0.00705882, 0.970951)
+bones/11/rotation = Quaternion(0.0956104, 0.0593624, 0.191218, 0.975075)
+bones/12/rotation = Quaternion(0.0110654, -0.00156358, -0.115155, 0.993285)
+bones/13/rotation = Quaternion(-0.0281289, -0.0916614, 0.051201, 0.994075)
+bones/15/rotation = Quaternion(0.106753, 0.00736898, 0.0447691, 0.99325)
+bones/16/rotation = Quaternion(0.13971, -4.34339e-05, -0.0201505, 0.989988)
+bones/17/rotation = Quaternion(0.178746, 0.000333617, -0.0183453, 0.983724)
+bones/19/rotation = Quaternion(0.0536366, -0.000305957, 0.0416073, 0.997693)
+bones/20/rotation = Quaternion(0.149299, 1.07742e-06, -0.0187718, 0.988614)
+bones/21/rotation = Quaternion(0.182815, 2.99769e-08, -0.0229863, 0.982879)
+bones/23/rotation = Quaternion(0.109387, 0.00396126, 0.0339035, 0.993413)
+bones/24/rotation = Quaternion(0.156416, -2.85683e-06, -0.0127558, 0.987609)
+bones/25/rotation = Quaternion(0.238096, -0.00100646, -0.0320224, 0.970713)
+bones/27/rotation = Quaternion(0.120213, -0.00746795, -0.0157977, 0.992594)
+bones/28/rotation = Quaternion(0.154289, 0.0056592, 0.0172169, 0.987859)
+bones/29/rotation = Quaternion(0.141121, -0.000643976, -0.0139571, 0.989894)
+bones/31/rotation = Quaternion(0.628742, -0.364763, 0.55323, 0.406899)
+bones/32/rotation = Quaternion(0.426808, -0.127492, -0.0250551, 0.89496)
+bones/33/rotation = Quaternion(0.00283782, -0.00375855, -0.248651, 0.968582)
+bones/34/rotation = Quaternion(0.0292042, -0.113646, 0.0319676, 0.992577)
+bones/35/rotation = Quaternion(0.102711, -0.0814192, -0.210676, 0.96873)
+bones/36/rotation = Quaternion(-0.0116467, 0.0366962, 0.213115, 0.976268)
+bones/37/rotation = Quaternion(0.00903461, -0.00146451, -0.0627422, 0.997988)
+bones/39/rotation = Quaternion(0.201576, -0.0121181, -0.00772603, 0.979368)
+bones/40/rotation = Quaternion(0.099512, 1.29377e-05, 0.0233924, 0.994761)
+bones/41/rotation = Quaternion(0.160905, -0.00123674, 0.0172866, 0.986818)
+bones/43/rotation = Quaternion(0.133596, -0.00430979, -0.0283054, 0.990622)
+bones/44/rotation = Quaternion(0.139582, 5.68107e-07, 0.0202537, 0.990003)
+bones/45/rotation = Quaternion(0.249347, 0.0289308, 0.0438282, 0.966989)
+bones/47/rotation = Quaternion(0.191724, -0.00522375, -0.0130084, 0.981349)
+bones/48/rotation = Quaternion(0.111807, -2.61283e-06, 0.0135654, 0.993637)
+bones/49/rotation = Quaternion(0.18023, 0.102244, 0.0481722, 0.977109)
+bones/51/rotation = Quaternion(0.1491, 0.0159573, -0.0125601, 0.988614)
+bones/52/rotation = Quaternion(0.141033, 1.96972e-05, 0.0226817, 0.989745)
+bones/53/rotation = Quaternion(0.206793, 0.000566754, 0.0419109, 0.977486)
+bones/55/position = Vector3(0.117379, -0.0617032, 0.00108863)
+bones/55/rotation = Quaternion(0.0548886, 0.0773663, 0.992893, -0.071867)
+bones/56/rotation = Quaternion(-0.294805, -0.00673877, -0.00104866, 0.955533)
+bones/57/rotation = Quaternion(0.624735, 0.106254, 0.0100732, 0.773508)
+bones/58/rotation = Quaternion(0.260432, -0.0798114, 0.021433, 0.961949)
+bones/60/position = Vector3(-0.117379, -0.0617031, 0.0054442)
+bones/60/rotation = Quaternion(-0.0521953, 0.00112253, 0.994364, -0.0922791)
+bones/61/rotation = Quaternion(-0.152049, 0.0241967, 0.00312583, 0.988072)
+bones/62/rotation = Quaternion(0.556797, -0.136104, -0.0422319, 0.818333)
+bones/63/rotation = Quaternion(0.268797, 0.0802719, -0.0225065, 0.959582)
+
+[node name="Front_Light" type="SpotLight3D" parent="Protagonists/seigro_gamma"]
+transform = Transform3D(1, 0, 0, 0, 0.258819, -0.965926, 0, 0.965926, 0.258819, 0, -0.768836, 0.544734)
+visible = false
+spot_attenuation = 0.08
+spot_angle = 13.4862
+
+[node name="Top_Light" type="SpotLight3D" parent="Protagonists/seigro_gamma"]
+transform = Transform3D(0.745246, 0.170266, 0.644684, -0.158664, -0.893794, 0.419473, 0.647637, -0.414899, -0.639082, 1.03017, 2.11472, -0.905459)
+spot_range = 3.02406
+spot_attenuation = 0.08
+spot_angle = 23.8825
+
+[node name="Area3D" type="Area3D" parent="Protagonists/seigro_gamma"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Protagonists/seigro_gamma/Area3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CylinderShape3D_ebow2")
+
+[node name="Backdrop" type="VBoxContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Spacer" type="Control" parent="Backdrop"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="TextureRect" type="TextureRect" parent="Backdrop"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.5
+mouse_filter = 2
+texture = SubResource("GradientTexture2D_kbdhy")
+
+[node name="Lore" type="MarginContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 22
+theme_override_constants/margin_top = 22
+theme_override_constants/margin_right = 22
+theme_override_constants/margin_bottom = 22
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Lore"]
+layout_mode = 2
+mouse_filter = 2
+alignment = 1
+
+[node name="Label" type="Label" parent="Lore/VBoxContainer"]
+layout_mode = 2
+text = "Select a Protagonist"
+label_settings = SubResource("LabelSettings_yd432")
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="HSeparator" type="HSeparator" parent="Lore/VBoxContainer"]
+layout_mode = 2
+mouse_filter = 1
+
+[node name="Spacer" type="Control" parent="Lore/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="Protagonists" type="HBoxContainer" parent="Lore/VBoxContainer"]
+layout_mode = 2
+mouse_filter = 2
+alignment = 1
+
+[node name="Spacer" type="Control" parent="Lore/VBoxContainer/Protagonists"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="ethan_lennox" type="VBoxContainer" parent="Lore/VBoxContainer/Protagonists"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Chara_Name" type="Label" parent="Lore/VBoxContainer/Protagonists/ethan_lennox"]
+layout_mode = 2
+text = "Ethan Lennox"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Lore/VBoxContainer/Protagonists/ethan_lennox"]
+layout_mode = 2
+mouse_filter = 2
+alignment = 1
+
+[node name="TextureRect" type="TextureRect" parent="Lore/VBoxContainer/Protagonists/ethan_lennox/HBoxContainer"]
+custom_minimum_size = Vector2(32, 0)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("3_veh32")
+expand_mode = 5
+
+[node name="TextureRect2" type="TextureRect" parent="Lore/VBoxContainer/Protagonists/ethan_lennox/HBoxContainer"]
+custom_minimum_size = Vector2(32, 0)
+layout_mode = 2
+mouse_filter = 2
+texture = SubResource("AtlasTexture_8bcww")
+expand_mode = 5
+
+[node name="TextureRect3" type="TextureRect" parent="Lore/VBoxContainer/Protagonists/ethan_lennox/HBoxContainer"]
+custom_minimum_size = Vector2(32, 0)
+layout_mode = 2
+mouse_filter = 2
+texture = SubResource("AtlasTexture_7d0k5")
+expand_mode = 5
+
+[node name="Spacer2" type="Control" parent="Lore/VBoxContainer/Protagonists"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="sven_moller" type="VBoxContainer" parent="Lore/VBoxContainer/Protagonists"]
+visible = false
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Chara_Name" type="Label" parent="Lore/VBoxContainer/Protagonists/sven_moller"]
+layout_mode = 2
+text = "Ethan Lennox"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Lore/VBoxContainer/Protagonists/sven_moller"]
+layout_mode = 2
+alignment = 1
+
+[node name="TextureRect" type="TextureRect" parent="Lore/VBoxContainer/Protagonists/sven_moller/HBoxContainer"]
+custom_minimum_size = Vector2(32, 0)
+layout_mode = 2
+texture = ExtResource("3_veh32")
+expand_mode = 5
+
+[node name="TextureRect2" type="TextureRect" parent="Lore/VBoxContainer/Protagonists/sven_moller/HBoxContainer"]
+custom_minimum_size = Vector2(32, 0)
+layout_mode = 2
+texture = SubResource("AtlasTexture_8bcww")
+expand_mode = 5
+
+[node name="TextureRect3" type="TextureRect" parent="Lore/VBoxContainer/Protagonists/sven_moller/HBoxContainer"]
+custom_minimum_size = Vector2(32, 0)
+layout_mode = 2
+texture = SubResource("AtlasTexture_7d0k5")
+expand_mode = 5
+
+[node name="Spacer3" type="Control" parent="Lore/VBoxContainer/Protagonists"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="seigro_gamma" type="VBoxContainer" parent="Lore/VBoxContainer/Protagonists"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Chara_Name" type="Label" parent="Lore/VBoxContainer/Protagonists/seigro_gamma"]
+layout_mode = 2
+text = "Seigro Gamma"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Lore/VBoxContainer/Protagonists/seigro_gamma"]
+layout_mode = 2
+mouse_filter = 2
+alignment = 1
+
+[node name="TextureRect" type="TextureRect" parent="Lore/VBoxContainer/Protagonists/seigro_gamma/HBoxContainer"]
+custom_minimum_size = Vector2(32, 0)
+layout_mode = 2
+mouse_filter = 2
+texture = SubResource("AtlasTexture_8ct4g")
+expand_mode = 5
+
+[node name="TextureRect2" type="TextureRect" parent="Lore/VBoxContainer/Protagonists/seigro_gamma/HBoxContainer"]
+custom_minimum_size = Vector2(32, 0)
+layout_mode = 2
+mouse_filter = 2
+texture = SubResource("AtlasTexture_7dx12")
+expand_mode = 5
+
+[node name="TextureRect3" type="TextureRect" parent="Lore/VBoxContainer/Protagonists/seigro_gamma/HBoxContainer"]
+custom_minimum_size = Vector2(32, 0)
+layout_mode = 2
+mouse_filter = 2
+texture = SubResource("AtlasTexture_bhfcp")
+expand_mode = 5
+
+[node name="Spacer4" type="Control" parent="Lore/VBoxContainer/Protagonists"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="eksono_delta" type="VBoxContainer" parent="Lore/VBoxContainer/Protagonists"]
+visible = false
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Chara_Name" type="Label" parent="Lore/VBoxContainer/Protagonists/eksono_delta"]
+layout_mode = 2
+text = "Ethan Lennox"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Lore/VBoxContainer/Protagonists/eksono_delta"]
+layout_mode = 2
+alignment = 1
+
+[node name="TextureRect" type="TextureRect" parent="Lore/VBoxContainer/Protagonists/eksono_delta/HBoxContainer"]
+custom_minimum_size = Vector2(32, 0)
+layout_mode = 2
+texture = ExtResource("3_veh32")
+expand_mode = 5
+
+[node name="TextureRect2" type="TextureRect" parent="Lore/VBoxContainer/Protagonists/eksono_delta/HBoxContainer"]
+custom_minimum_size = Vector2(32, 0)
+layout_mode = 2
+texture = SubResource("AtlasTexture_8bcww")
+expand_mode = 5
+
+[node name="TextureRect3" type="TextureRect" parent="Lore/VBoxContainer/Protagonists/eksono_delta/HBoxContainer"]
+custom_minimum_size = Vector2(32, 0)
+layout_mode = 2
+texture = SubResource("AtlasTexture_7d0k5")
+expand_mode = 5
+
+[node name="Spacer5" type="Control" parent="Lore/VBoxContainer/Protagonists"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="Description" type="RichTextLabel" parent="Lore/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+mouse_filter = 2
+bbcode_enabled = true
+text = "[center] Select a charater as the protagonist of the story.
+You will be receiving the story in the perspective of this character, by the point they enter the overall narrative.
+A character that enters later in the story will also make available to you later progress equipment and perks, but you will miss collectibles, cutscenes and lore entries of earlier parts of the story.
+[/center]"
+
+[connection signal="mouse_entered" from="Protagonists/ethan_lennox/Area3D" to="." method="_on_ethan_lennox_mouse_entered"]
+[connection signal="mouse_exited" from="Protagonists/ethan_lennox/Area3D" to="." method="unselect_chara"]
+[connection signal="mouse_entered" from="Protagonists/seigro_gamma/Area3D" to="." method="_on_seigro_gamma_mouse_entered"]
+[connection signal="mouse_exited" from="Protagonists/seigro_gamma/Area3D" to="." method="unselect_chara"]
+
+[editable path="Protagonists/ethan_lennox/model"]
+[editable path="Protagonists/seigro_gamma/model"]
