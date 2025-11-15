@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+	<linearGradient id="BG" gradientTransform="rotate(90 0 0)">
+		<stop offset="0.67" stop-color="#2f3581" />
+		<stop stop-color="none" offset="1" stop-opacity="0" />
+	</linearGradient>
+	<rect width="16" height="14" fill="url(#BG)" x="0" y="0" />
+	<linearGradient id="Diamond" gradientTransform="rotate(90 0 0)">
+		<stop stop-color="yellow" offset="0.56" />
+		<stop offset="1" stop-color="#3b2e1f" />
+	</linearGradient>
+	<path d="M6.5 9.5 3.5 6.5 8 2 12.5 6.5 9.5 9.5" stroke="url(#Diamond)" stroke-opacity="1" stroke-width="0.3" fill="none" fill-opacity="0" stroke-linecap="round" stroke-linejoin="miter" />
+	<path d="M0 10H4Q5 10 4 9L1.5 6.5 4 4 9.5 9.5 8 11 6.5 9.5 12 4 14.5 6.5 12 9Q11 10 12 10H16" fill="none" opacity="1" stroke="yellow" stroke-opacity="1" stroke-width="0.3" fill-opacity="0" stroke-linecap="round" stroke-linejoin="bevel" />
+	<line x2="14" stroke="#ff0" y2="12" x1="2" y1="12" stroke-width="0.2" stroke-linecap="round" />
+</svg>

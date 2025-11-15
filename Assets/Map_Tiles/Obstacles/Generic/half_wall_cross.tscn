@@ -1,0 +1,38 @@
+[gd_scene load_steps=3 format=3 uid="uid://balkkj12v66yk"]
+
+[ext_resource type="Texture2D" uid="uid://dr6vmutb2v2gr" path="res://misc/textures/checkerboard.png" id="1_lp8jg"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_l2wcb"]
+albedo_texture = ExtResource("1_lp8jg")
+uv1_offset = Vector3(-0.25, 0, -0.25)
+uv1_triplanar = true
+
+[node name="Wall_Junction" type="CSGCombiner3D"]
+
+[node name="CSGBox3D" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+material = SubResource("StandardMaterial3D_l2wcb")
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.375, 0.5, 0.375)
+operation = 2
+size = Vector3(0.25, 1, 0.25)
+material = SubResource("StandardMaterial3D_l2wcb")
+
+[node name="CSGBox3D3" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.375, 0.5, -0.375)
+operation = 2
+size = Vector3(0.25, 1, 0.25)
+material = SubResource("StandardMaterial3D_l2wcb")
+
+[node name="CSGBox3D4" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.375, 0.5, 0.375)
+operation = 2
+size = Vector3(0.25, 1, 0.25)
+material = SubResource("StandardMaterial3D_l2wcb")
+
+[node name="CSGBox3D5" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.375, 0.5, -0.375)
+operation = 2
+size = Vector3(0.25, 1, 0.25)
+material = SubResource("StandardMaterial3D_l2wcb")

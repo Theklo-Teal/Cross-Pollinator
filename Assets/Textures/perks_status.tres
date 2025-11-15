@@ -1,0 +1,9 @@
+[gd_resource type="AtlasTexture" load_steps=2 format=3 uid="uid://coc6nxopc8jr3"]
+
+[ext_resource type="Texture2D" uid="uid://dm6oyn6lo65xk" path="res://Assets/Textures/perks_status.png" id="1_rvaub"]
+
+[resource]
+resource_local_to_scene = true
+atlas = ExtResource("1_rvaub")
+region = Rect2(0, 0, 32, 32)
+filter_clip = true
