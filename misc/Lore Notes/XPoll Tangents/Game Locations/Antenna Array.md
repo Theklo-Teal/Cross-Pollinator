@@ -1,0 +1,1 @@
+An attempt by [[The Warehouse]] to build an Orgone [[Sanctum|Transceiver]], but instead if just disturbs the [[Orgone]] flow in living beings, causing hallucinations and depressive feelings. Fighting here has a higher chance of panic and fumbling.

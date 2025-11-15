@@ -1,0 +1,1 @@
+A giant brain in a vat. In lieu of Agarthian [[Agarthian Computers|Neural Computers]], [[The Warehouse]] attempted to produce substantial amounts of ectoplasm by just having a bigger and denser brain to harvest from.

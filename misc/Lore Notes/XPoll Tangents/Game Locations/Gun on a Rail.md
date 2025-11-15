@@ -1,0 +1,1 @@
+The testing range of a large electromagnetic gun mounted on railway carriage. It uses miniaturized [[Ectoplasm Generators]] that consume its fuel completely at the instant of shooting.

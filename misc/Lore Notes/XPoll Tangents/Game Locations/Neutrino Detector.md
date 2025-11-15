@@ -1,0 +1,1 @@
+A large flooded room lined with photo-multipliers.

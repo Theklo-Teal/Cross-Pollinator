@@ -1,0 +1,9 @@
+[[Agarthians]] are capable or relaying thoughts and emotions directly between each other by sharing bodily fluids. This is usually accomplished by tongue kissing and swapping saliva, therefore the action is commonly called "kissing". The [[Orgone|Ectoplasm]] in their body acts like "liquid neurons" temporarily linking the two brains together as if they were a single brain.
+
+Kissing might be the most convenient way to read minds, but "tasting" any bodily fluid, like blood, sweat or tears will also work. Sex between Agarthian provides the most clear and deep connection as their genitals have been modified for improved secretion of lubricating fluids with high concentrations of ectoplasm. It is common for Agarthians to engage sexually as a form of communication when more complicated thoughts or long discussions are necessary.
+
+Any conscious being will produce small amounts of ectoplasm, so Agarthian have a limited capacity to read the minds of Danavo, although unable to transmit. They consider this to have mixed results and it is usually frowned upon, but still practiced during interrogations and espionage.
+
+Although there are mechanism in altered neurons to discriminate the messages of two minds through a signature, Agarthians feel that messages conveyed in kissing are exceedingly compelling and pervasive, so it would be dangerous to kiss someone with mental disorders or hostile thoughts.
+
+This ability shaped Agarthian culture drastically, making them very promiscuous and sexually liberated as well as having priority concerns for personal well-being and mutual understanding. It can also be an insidious tool for mind control and breach of privacy which are rumored to have been used against Danavo or in internal power play before, although never admitted.
