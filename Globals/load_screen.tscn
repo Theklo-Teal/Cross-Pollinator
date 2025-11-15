@@ -1,0 +1,66 @@
+[gd_scene load_steps=4 format=3 uid="uid://cug87atx2y56k"]
+
+[ext_resource type="Texture2D" uid="uid://ma5k4sfqt3g7" path="res://Assets/Textures/load_graphic.png" id="1_pverd"]
+
+[sub_resource type="GDScript" id="GDScript_q1dgu"]
+script/source = "extends Node
+
+const COUNTDOWN = 0.4
+var timer : float
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	timer += delta
+	if timer >= COUNTDOWN:
+		timer = 0
+		%graphic.texture.region.position.x = int(%graphic.texture.region.position.x + 64) % (64 * 8)
+
+
+func start_level(_level):
+	pass
+"
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ewygf"]
+atlas = ExtResource("1_pverd")
+region = Rect2(0, 0, 64, 64)
+
+[node name="LoadScreen" type="Node"]
+script = SubResource("GDScript_q1dgu")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+custom_minimum_size = Vector2(500, 0)
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -75.0
+offset_top = -54.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="Label" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Loading..."
+
+[node name="ProgressBar" type="ProgressBar" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="graphic" type="TextureRect" parent="."]
+unique_name_in_owner = true
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -32.0
+offset_top = -64.0
+offset_right = 32.0
+grow_horizontal = 2
+grow_vertical = 0
+texture = SubResource("AtlasTexture_ewygf")
