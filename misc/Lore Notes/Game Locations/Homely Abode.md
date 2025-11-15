@@ -1,0 +1,1 @@
+A room that uncannily imitates a plain normal Danavo house.

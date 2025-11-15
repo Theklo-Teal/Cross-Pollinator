@@ -1,0 +1,1 @@
+Airtight chambers where a few dead Agarthians have been cut open and studied.

@@ -1,0 +1,1 @@
+A room that uncannily imitates a common and typical Agarthian house.

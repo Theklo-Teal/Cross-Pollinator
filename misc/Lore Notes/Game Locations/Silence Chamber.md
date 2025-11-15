@@ -1,0 +1,1 @@
+A Warehouse experiment at creating constructs that cross past the 3 dimensions of space. It's composed of rapidly rotating rings of an exotic liquid metal that produce gravity shielding effects. The entire room acts like a "dimensional engine", an area where matter can be bent and moved out of the observable universe.

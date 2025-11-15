@@ -1,0 +1,1 @@
+An abandoned Agarthian facility where [[Orgone|ectoplasm]] stabilization and storage was being researched. A very tall set of self-illuminating pipes rise towards the ceiling and a cold ectoplasm fog spreads on the floor.
