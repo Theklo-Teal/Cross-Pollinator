@@ -1,1 +1,0 @@
-Formally known as "The Agency", is a guiding book and compilation of things all Agarthians should know in common.
