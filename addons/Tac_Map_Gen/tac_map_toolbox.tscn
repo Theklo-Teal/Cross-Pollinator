@@ -1,0 +1,479 @@
+[gd_scene load_steps=5 format=3 uid="uid://dcev6f54laanu"]
+
+[sub_resource type="GDScript" id="GDScript_3h1mf"]
+script/source = "@tool
+extends VBoxContainer
+
+var plugin : EditorPlugin
+
+var kind_button_group = ButtonGroup.new()
+var prop_button_group = ButtonGroup.new()
+var floor_button_group = ButtonGroup.new()
+var props : Array[String]
+var floors : Array[Dictionary]
+var prop_thumbnail_tags : Dictionary
+var floor_thumbnail_tags : Dictionary
+
+func _ready():
+	for each in %Tile_Kinds.get_children():
+		each.button_group = kind_button_group
+	kind_button_group.pressed.connect(_on_tile_kind_switched)
+	
+	%Prop_Lib.clear()
+	%Floor_Lib.clear()
+	for each in DirAccess.get_directories_at(\"res://Assets/Map_Tiles/Obstacles\"):
+		%Prop_Lib.add_item(each)
+	for each in DirAccess.get_directories_at(\"res://Assets/Map_Tiles/Floors\"):
+		%Floor_Lib.add_item(each)
+	
+	_on_prop_lib_item_selected(0)
+	_on_floor_lib_item_selected(0)
+
+
+func _on_tile_kind_switched(butt:Button):
+	#TODO: select the first visible button.
+	var filter : String = [\"\", \"half\", \"full\", \"\"][butt.get_meta(\"idx\", 0)]
+	for each in %Prop_Picker.get_children():
+		if each.get_meta(\"basename\").begins_with(filter) or filter.is_empty():
+			each.show()
+		else:
+			each.hide()
+
+func _on_filter_text_submitted(entry:String):
+	if entry.is_empty():
+		_on_tile_kind_switched(kind_button_group.get_pressed_button())
+		for each in %Floor_Picker.get_children():
+			each.show()
+		return
+	
+	for each in %Prop_Picker.get_children() + %Floor_Picker.get_children():
+		each.hide()
+	
+	var hits : Array
+	for each in entry.split(\" \", false):
+		if each in prop_thumbnail_tags.keys() + floor_thumbnail_tags.keys():
+			for thumbnail in prop_thumbnail_tags[each] + floor_thumbnail_tags[each]:
+				if not thumbnail in hits:
+					hits.append(thumbnail)
+	
+	for each in hits:
+		each.show()
+
+func _on_clear_filter_pressed():
+	%Filter.clear()
+	_on_filter_text_submitted(\"\")
+
+func _shift_map(direction:Vector2i):
+	plugin.map_node.shift_map(direction)
+
+func get_tile_content():
+	var floor = floor_button_group.get_pressed_button()
+	if not floor == null:
+		floor = floor.get_meta(\"idx\", null)
+	if not floor == null:
+		floor = floors[floor]
+	
+	var prop = prop_button_group.get_pressed_button()
+	if not prop == null:
+		prop = prop.get_meta(\"idx\", null)
+	if not prop == null:
+		prop = props[prop]
+	
+	var ans = {
+		\"kind\" : kind_button_group.get_pressed_button().get_meta(\"idx\", 0),
+		\"floor\" : floor,
+		\"prop\" : prop, 
+	}
+	
+	return ans
+
+func get_edit_mode():
+	return %Edit_Mode.selected
+
+func set_tile_options(data:Dictionary):
+	for each : Button in %Tile_Kinds.get_children():
+		if each.get_meta(\"idx\") == data.kind:
+			each.button_pressed = true
+			break
+	
+	for idx : int in range(%Floor_Lib.item_count):
+		if %Floor_Lib.get_item_text(idx) == data.floor_library:
+			%Floor_Lib.select(idx)
+			break
+	for idx : int in range(%Prop_Lib.item_count):
+		if %Prop_Lib.get_item_text(idx) == data.prop_library:
+			%Prop_Lib.select(idx)
+			break
+	
+	for each : Control in %Floor_Picker.get_children():
+		if each.get_meta(\"basename\") == data.floor:
+			floor_button_group.get_buttons()[each.get_meta(\"idx\")].button_pressed = true
+			break
+	for each : Control in %Prop_Picker.get_children():
+		if each.get_meta(\"basename\") == data.prop:
+			prop_button_group.get_buttons()[each.get_meta(\"idx\")].button_pressed = true
+			break
+
+#region update libraries and thumbnails
+func _on_prop_lib_item_selected(index):
+	
+	props.clear()
+	for each in %Prop_Picker.get_children():
+		each.queue_free()
+
+	var filter_idx = kind_button_group.get_pressed_button()
+	if filter_idx == null:
+		filter_idx = 0
+	else:
+		filter_idx = filter_idx.get_meta(\"idx\", 0)
+	var filter : String = [\"\", \"half\", \"full\", \"\"][filter_idx]
+
+	var default_selected := false
+	var num : int = 0
+	var library_dir = \"res://Assets/Map_Tiles/Obstacles/\"+ %Prop_Lib.get_item_text(index) +\"/\"	
+	for asset in DirAccess.get_files_at(library_dir):
+		var thumbnail = define_thumbnail(asset, prop_button_group)
+		thumbnail.set_meta(\"idx\", num)
+		thumbnail.set_meta(\"basename\", asset.get_basename())
+		props.append(library_dir+asset)
+		if not asset.begins_with(filter):
+			thumbnail.hide()
+		elif not default_selected:
+			thumbnail.button_pressed = true
+			default_selected = true
+		num += 1
+		%Prop_Picker.add_child(thumbnail)
+		
+	prop_thumbnail_tags = index_tags(%Prop_Picker.get_children(), [\"full, half\"])
+
+func _on_floor_lib_item_selected(index):
+	floors.clear()
+	for each in %Floor_Picker.get_children():
+		each.queue_free()
+	
+	var asset_list : Array[String]
+	var default_selected := false
+	var num : int = 0
+	var library_dir = \"res://Assets/Map_Tiles/Floors/\"+ %Floor_Lib.get_item_text(index) +\"/\"
+	for file in DirAccess.get_files_at(library_dir):
+		if file.get_extension() == \"ini\":
+			var config = ConfigFile.new()
+			config.load(library_dir+file)
+			for asset in config.get_section_keys(\"offsets\"):
+				asset_list.append(asset)
+				if file.begins_with(\"static\"):
+					var tex_size : Vector2i = config.get_value(\"base\", \"size\", Vector2i(32,32))
+					var tex_pos : Vector2i = tex_size * config.get_value(\"offsets\", asset, Vector2i.ZERO)
+					floors.append({
+						\"name\": asset,
+						\"path\": config.get_value(\"base\", \"texture\"),
+						\"kind\": 0,  #NOTE: 0 = static Sprite3D, 1 = AnimatedSprite3D, 2 = Custom Scene
+						\"rect\": Rect2i(tex_pos, tex_size),
+						})
+				elif file.begins_with(\"anime\"):
+					var tex_size : Vector2i = config.get_value(\"base\", \"size\", Vector2i(32,32))
+					var tex_frames : Array[Vector2i]
+					for frame in config.get_value(\"offsets\", asset, [Vector2i.ZERO, ]):
+						tex_frames.append(tex_size * frame)
+					floors.append({
+							\"name\": asset,
+							\"path\": config.get_value(\"base\", \"texture\"),
+							\"kind\": 1,  #NOTE: 0 = static Sprite3D, 1 = AnimatedSprite3D, 2 = Custom Scene
+							\"size\": tex_size,
+							\"frames\": tex_frames,
+							\"delay\": config.get_value(\"delays\", asset, 0.5), 
+							\"mode\": config.get_value(\"modes\", asset, Animation.LOOP_LINEAR),
+							})
+		else:  # Custom scene floor
+			asset_list.append(file)
+			floors.append({
+				\"name\": file,
+				\"path\":library_dir+file,
+				\"kind\":2,
+				})
+		
+	for asset in asset_list:
+		var thumbnail = define_thumbnail(asset, floor_button_group)
+		thumbnail.set_meta(\"idx\", num)
+		thumbnail.set_meta(\"basename\", asset.get_basename())
+		if not default_selected:
+			thumbnail.button_pressed = true
+			default_selected = true
+		num += 1
+		%Floor_Picker.add_child(thumbnail)
+		
+	floor_thumbnail_tags = index_tags(%Floor_Picker.get_children(), [\"floor\", \"floors\"])
+
+
+func define_thumbnail(asset_filename:String, button_group:ButtonGroup):
+	var thumbnail = Button.new()
+	thumbnail.button_group = button_group
+	thumbnail.text = asset_filename.get_basename()
+	thumbnail.toggle_mode = true
+	return thumbnail
+
+func index_tags(asset_list:Array[Node], tag_blacklist:Array[String] = []) -> Dictionary:
+	## Building the index for searching thumbnails by tag
+	var findings : Dictionary
+	
+	for asset in asset_list:
+		var asset_tags = asset.get_meta(\"basename\", \"\").split(\"_\")
+		
+		for tag in asset_tags:
+			if tag in tag_blacklist:
+				continue
+			if not tag in findings:
+				findings[tag] = []
+			findings[tag].append(asset)
+			
+	return findings
+#endregion
+"
+
+[sub_resource type="GDScript" id="GDScript_0h13y"]
+resource_name = "Edit_Mode"
+script/source = "@tool
+extends Button
+
+## A button that cycles through several editing modes.
+
+var hints = [
+	\"Click or Drag to place tiles\",
+	\"This isn't implemented\",
+	\"Disables TacMap editing functionality, so you can use 3D space gizmos\",
+	\"Click to sample existing tile options to reuse\",
+	]
+var options = [\"Paint\", \"Flood\", \"Transform\", \"Pick\"]
+var selected : int = 0
+
+func _ready():
+	text = options[selected]
+	tooltip_text = hints[selected]
+
+func _on_pressed():
+	var dir = [1, -1][int( Input.is_key_pressed(KEY_SHIFT) )]
+	selected = wrapi(selected + dir, 0, options.size())
+	text = options[selected]
+	tooltip_text = hints[selected]
+"
+
+[sub_resource type="ButtonGroup" id="ButtonGroup_yne1b"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_t2g1a"]
+bg_color = Color(1, 1, 1, 0.196078)
+border_width_left = 2
+border_width_top = 4
+border_color = Color(0, 0, 0, 0.647059)
+border_blend = true
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[node name="Tac_Map_Toolbox" type="VBoxContainer"]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -171.0
+grow_horizontal = 2
+grow_vertical = 0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = SubResource("GDScript_3h1mf")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="HBoxContainer"]
+layout_mode = 2
+text = "Filter:"
+
+[node name="Filter" type="LineEdit" parent="HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="clear_filter" type="Button" parent="HBoxContainer"]
+layout_mode = 2
+tooltip_text = "Clear Filter"
+text = " x "
+
+[node name="Label3" type="Label" parent="HBoxContainer"]
+layout_mode = 2
+text = "Edit Tools:"
+
+[node name="Edit_Mode" type="Button" parent="HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Paint"
+script = SubResource("GDScript_0h13y")
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Tile_Kinds" type="VBoxContainer" parent="HBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Full_Obst" type="Button" parent="HBoxContainer2/Tile_Kinds"]
+layout_mode = 2
+tooltip_text = "Adds a tall obstacle like a wall or pillar."
+toggle_mode = true
+button_pressed = true
+button_group = SubResource("ButtonGroup_yne1b")
+text = "Full Cover"
+metadata/idx = 2
+
+[node name="Half_Obst" type="Button" parent="HBoxContainer2/Tile_Kinds"]
+layout_mode = 2
+tooltip_text = "Adds and short obstacle, that characters can vault over."
+toggle_mode = true
+button_group = SubResource("ButtonGroup_yne1b")
+text = "Half Cover"
+metadata/idx = 1
+
+[node name="Floor" type="Button" parent="HBoxContainer2/Tile_Kinds"]
+layout_mode = 2
+tooltip_text = "Deletes any obstacle/cover and adds floor texture."
+toggle_mode = true
+button_group = SubResource("ButtonGroup_yne1b")
+text = "Rem Cover"
+metadata/idx = 0
+
+[node name="Ladder" type="Button" parent="HBoxContainer2/Tile_Kinds"]
+layout_mode = 2
+toggle_mode = true
+button_group = SubResource("ButtonGroup_yne1b")
+text = "Ladder"
+metadata/idx = 3
+
+[node name="HSplitContainer" type="HSplitContainer" parent="HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer2/HSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer2/HSplitContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HBoxContainer2/HSplitContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Obstacles: "
+
+[node name="Prop_Lib" type="OptionButton" parent="HBoxContainer2/HSplitContainer/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+selected = 0
+allow_reselect = true
+item_count = 1
+popup/item_0/text = "Generic"
+
+[node name="Prop_Panel" type="PanelContainer" parent="HBoxContainer2/HSplitContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_t2g1a")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="HBoxContainer2/HSplitContainer/VBoxContainer/Prop_Panel"]
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_scroll_mode = 0
+
+[node name="Prop_Picker" type="HFlowContainer" parent="HBoxContainer2/HSplitContainer/VBoxContainer/Prop_Panel/ScrollContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="HBoxContainer2/HSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="HBoxContainer2/HSplitContainer/VBoxContainer2"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HBoxContainer2/HSplitContainer/VBoxContainer2/HBoxContainer2"]
+layout_mode = 2
+text = "Floors: "
+
+[node name="Floor_Lib" type="OptionButton" parent="HBoxContainer2/HSplitContainer/VBoxContainer2/HBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+selected = 0
+allow_reselect = true
+item_count = 1
+popup/item_0/text = "Generic"
+
+[node name="Floor_Panel" type="PanelContainer" parent="HBoxContainer2/HSplitContainer/VBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_t2g1a")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="HBoxContainer2/HSplitContainer/VBoxContainer2/Floor_Panel"]
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_scroll_mode = 0
+
+[node name="Floor_Picker" type="HFlowContainer" parent="HBoxContainer2/HSplitContainer/VBoxContainer2/Floor_Panel/ScrollContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Edit_Tools" type="GridContainer" parent="HBoxContainer2"]
+layout_mode = 2
+size_flags_vertical = 4
+columns = 3
+
+[node name="Spacer" type="Control" parent="HBoxContainer2/Edit_Tools"]
+layout_mode = 2
+
+[node name="shft_up" type="Button" parent="HBoxContainer2/Edit_Tools"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Z+"
+
+[node name="Spacer2" type="Control" parent="HBoxContainer2/Edit_Tools"]
+layout_mode = 2
+
+[node name="shft_left" type="Button" parent="HBoxContainer2/Edit_Tools"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "X+"
+
+[node name="Label" type="Label" parent="HBoxContainer2/Edit_Tools"]
+layout_mode = 2
+text = "Shift"
+
+[node name="shft_right" type="Button" parent="HBoxContainer2/Edit_Tools"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "X-"
+
+[node name="Spacer3" type="Control" parent="HBoxContainer2/Edit_Tools"]
+layout_mode = 2
+
+[node name="shft_down" type="Button" parent="HBoxContainer2/Edit_Tools"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Z-"
+
+[node name="Spacer4" type="Control" parent="HBoxContainer2/Edit_Tools"]
+layout_mode = 2
+
+[connection signal="text_submitted" from="HBoxContainer/Filter" to="." method="_on_filter_text_submitted"]
+[connection signal="pressed" from="HBoxContainer/clear_filter" to="." method="_on_clear_filter_pressed"]
+[connection signal="pressed" from="HBoxContainer/Edit_Mode" to="HBoxContainer/Edit_Mode" method="_on_pressed"]
+[connection signal="item_selected" from="HBoxContainer2/HSplitContainer/VBoxContainer/HBoxContainer/Prop_Lib" to="." method="_on_prop_lib_item_selected"]
+[connection signal="item_selected" from="HBoxContainer2/HSplitContainer/VBoxContainer2/HBoxContainer2/Floor_Lib" to="." method="_on_floor_lib_item_selected"]
+[connection signal="pressed" from="HBoxContainer2/Edit_Tools/shft_up" to="." method="_shift_map" binds= [Vector2i(0, 1)]]
+[connection signal="pressed" from="HBoxContainer2/Edit_Tools/shft_left" to="." method="_shift_map" binds= [Vector2i(1, 0)]]
+[connection signal="pressed" from="HBoxContainer2/Edit_Tools/shft_right" to="." method="_shift_map" binds= [Vector2i(-1, 0)]]
+[connection signal="pressed" from="HBoxContainer2/Edit_Tools/shft_down" to="." method="_shift_map" binds= [Vector2i(0, -1)]]
