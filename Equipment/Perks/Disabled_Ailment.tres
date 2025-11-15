@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="CharacterPerk" load_steps=4 format=3 uid="uid://ds356gdnig868"]
+
+[ext_resource type="Texture2D" uid="uid://dm6oyn6lo65xk" path="res://Assets/Textures/perks_status.png" id="1_hfr5k"]
+[ext_resource type="Script" uid="uid://hnx2142b5vvq" path="res://Equipment/base_perk.gd" id="2_de0rx"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ouqvj"]
+resource_local_to_scene = true
+atlas = ExtResource("1_hfr5k")
+region = Rect2(32, 64, 32, 32)
+
+[resource]
+script = ExtResource("2_de0rx")
+title = "Disabled"
+description = "The character lost their weapons and can't attack this turn."
+atlas = SubResource("AtlasTexture_ouqvj")

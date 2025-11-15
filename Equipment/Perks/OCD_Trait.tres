@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="CharacterPerk" load_steps=3 format=3 uid="uid://oedbvd6r842t"]
+
+[ext_resource type="Texture2D" uid="uid://coc6nxopc8jr3" path="res://Assets/Textures/perks_status.tres" id="1_esq27"]
+[ext_resource type="Script" uid="uid://hnx2142b5vvq" path="res://Equipment/base_perk.gd" id="2_db7w4"]
+
+[resource]
+script = ExtResource("2_db7w4")
+title = "Obsessive Compulsive"
+description = "The Character will perform the raised stance action at the end of the turn whenever they are in stress."
+atlas = ExtResource("1_esq27")

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="CharacterPerk" load_steps=4 format=3 uid="uid://38v3m6dlwar1"]
+
+[ext_resource type="Texture2D" uid="uid://dm6oyn6lo65xk" path="res://Assets/Textures/perks_status.png" id="1_0wfen"]
+[ext_resource type="Script" uid="uid://hnx2142b5vvq" path="res://Equipment/base_perk.gd" id="2_11qek"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ykyrx"]
+resource_local_to_scene = true
+atlas = ExtResource("1_0wfen")
+region = Rect2(96, 0, 32, 32)
+
+[resource]
+script = ExtResource("2_11qek")
+title = "Robotic"
+description = "The unit is immune to poisons, sexual and orgone attacks."
+atlas = SubResource("AtlasTexture_ykyrx")

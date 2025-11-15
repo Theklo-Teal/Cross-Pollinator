@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="CharacterPerk" load_steps=3 format=3 uid="uid://cu08b61giemtr"]
+
+[ext_resource type="Texture2D" uid="uid://coc6nxopc8jr3" path="res://Assets/Textures/perks_status.tres" id="1_cbpft"]
+[ext_resource type="Script" uid="uid://hnx2142b5vvq" path="res://Equipment/base_perk.gd" id="2_mvuxo"]
+
+[resource]
+script = ExtResource("2_mvuxo")
+title = "Cautious"
+description = "The Character will perform the low stance action at the end of their turn if under stress."
+atlas = ExtResource("1_cbpft")

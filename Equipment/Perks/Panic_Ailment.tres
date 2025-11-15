@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="CharacterPerk" load_steps=4 format=3 uid="uid://ckkdqhps1wo67"]
+
+[ext_resource type="Texture2D" uid="uid://dm6oyn6lo65xk" path="res://Assets/Textures/perks_status.png" id="1_2h7xh"]
+[ext_resource type="Script" uid="uid://hnx2142b5vvq" path="res://Equipment/base_perk.gd" id="2_cr65u"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1aj5h"]
+resource_local_to_scene = true
+atlas = ExtResource("1_2h7xh")
+region = Rect2(96, 32, 32, 32)
+
+[resource]
+script = ExtResource("2_cr65u")
+title = "Panic"
+description = "The unit will act erractically and can't be controlled. They havea chance to shoot at allies and their hit chance is lower."
+atlas = SubResource("AtlasTexture_1aj5h")
