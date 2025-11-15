@@ -1,0 +1,1 @@
+A small self-propelled device devised by Agarthians that rolla to a potentially hazardous area and scans the surroundings for items of interest or enemies.

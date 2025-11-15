@@ -1,0 +1,1 @@
+A Danavo headgear with an infrared lamp that can illuminate areas without being visible to other people without the appropriate goggles.

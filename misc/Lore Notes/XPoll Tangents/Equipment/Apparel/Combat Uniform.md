@@ -1,0 +1,1 @@
+The basic Agarthian infantry armor, included an improved [[Formal Vest|Vest]] and exoskeleton legs capable of carrying large weights and still increase speed and agility.

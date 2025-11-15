@@ -1,0 +1,1 @@
+An advanced Danavo headgear that automatically sweeps through multiple radiation types to adapt to conditions adverse to Night Vision Goggles, like smoke. It also has a limited ability to see enemies through walls.

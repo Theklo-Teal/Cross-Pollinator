@@ -1,0 +1,1 @@
+Adding harnesses and armor plates to the [[Light Uniform]] make it ready generic combat missions without overencumbering the soldier.

@@ -1,0 +1,1 @@
+Special suit with reinforced armor that tries to cover as much of the wearer's body as possible with bullet resistant parts.

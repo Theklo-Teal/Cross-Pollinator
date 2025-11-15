@@ -1,0 +1,1 @@
+They use playing card terms for their codenames.

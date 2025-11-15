@@ -1,0 +1,1 @@
+An Agarthian headgear that resembles wings behind the soldier's head. Robotic arms maneuvers a shield around the head of the soldier automatically according to detected gunshot and can deflect projectiles.

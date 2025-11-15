@@ -1,0 +1,1 @@
+Uses shotguns (unavailable to player)

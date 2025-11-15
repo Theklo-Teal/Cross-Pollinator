@@ -1,0 +1,1 @@
+Throwing an object that make enemies move to investigate

@@ -1,0 +1,1 @@
+A prototype Agarthian combat suit that looks like licorice candy wrapped around the body.

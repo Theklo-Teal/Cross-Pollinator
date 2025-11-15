@@ -1,0 +1,1 @@
+An adjacent enemy that attacks will be automatically attacked.

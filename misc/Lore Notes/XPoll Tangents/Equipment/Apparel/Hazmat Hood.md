@@ -1,0 +1,1 @@
+An Agarthian headgear that provides life support with comparable capabilities to the [[Closed-Cycle Rebreather]].

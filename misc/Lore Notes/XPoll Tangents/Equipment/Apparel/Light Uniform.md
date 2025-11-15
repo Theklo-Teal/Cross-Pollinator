@@ -1,0 +1,1 @@
+A black short sleeve shirt and cargo pants constitute the minimal dress for Danavo military staff outside the thick of combat.

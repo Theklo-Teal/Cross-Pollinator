@@ -1,0 +1,3 @@
+A facade name for the [[Agarthians]] as they operate above ground. They pretend to be a unremarkable administrative NGO. Holding multiple facilities in the form of office blocks, warehouses and mansions across the world, wherever Agarthians need to keep people away from accidentally stumbling upon their [[Sanctum]].
+It is also in some of these facilities where they are trained to do their jobs and engage in surreptitious activity.
+New Agarthians are born or manufactured in these facilities before getting transmigrated to Agartha. See [[Life Cycle]]

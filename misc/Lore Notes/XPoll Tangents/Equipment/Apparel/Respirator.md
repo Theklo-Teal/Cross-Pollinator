@@ -1,0 +1,1 @@
+Allows a soldier to operate in areas with toxic air

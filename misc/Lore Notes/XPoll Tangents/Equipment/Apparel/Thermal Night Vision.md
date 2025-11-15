@@ -1,0 +1,1 @@
+A passive infrared sensing googles that allows a Danavo soldier to see in the dark without being detected by someone with [[Active Night Vision]] goggles. More effective at seeing warm things, but can be easily blinded if a room or the air is too warm.

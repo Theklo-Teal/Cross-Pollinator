@@ -1,0 +1,1 @@
+An Agarthian [[Combat Uniform]] with added modules for rappelling and a [[Guided Darts|missile launcher]].

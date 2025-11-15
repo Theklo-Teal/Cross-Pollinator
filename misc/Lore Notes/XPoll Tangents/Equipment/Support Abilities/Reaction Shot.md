@@ -1,0 +1,1 @@
+Attack an enemy passing  through an adjacent tile.

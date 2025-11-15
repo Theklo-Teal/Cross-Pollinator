@@ -1,0 +1,1 @@
+A small flying sensor array that will produce a map of unexplored areas and tag enemies.
