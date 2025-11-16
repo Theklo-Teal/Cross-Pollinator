@@ -8,7 +8,8 @@ Other projects:
 
 Read "![CREDITS.txt](CREDITS.txt)" for information on third-party assets.
 
-
+![Screenshot of the Main Menu](misc/Main_Menu_Shot.png)
+![Screenshot of test combat mission](misc/Tactics_Gameplay_Shot.png)
 
 # DESCRIPTION
 A turn-based tactics combat Godot game with some light RPG elements.
