@@ -19,7 +19,7 @@ Command four characters as they explore the strange government projects in under
 Note that by the nature of not having a story well decided, different titles for this project are mentioned at different parts. The main working title is "Cross Pollinator" often shortened to "X-Poll". But "Chevron Detachment" is also used.
 
 This is part of my collection of projects in indefinite hiatus. I release it publicly in case someone likes the ideas and wants to develop them further or volunteers to work with me on them.
-See "![WHY IN HIATUS?](#WHY-IN-HIATUS?)" for more information.
+See ![WHY IN HIATUS?]("#WHY-IN-HIATUS") for more information.
 
 
 # THE CONCEPT
