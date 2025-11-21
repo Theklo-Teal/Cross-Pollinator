@@ -55,7 +55,7 @@ I've been also considering the big "common human" faction to be like the SCP Fou
 
 Some of the disbelief elements include the "DUMB", the existence of an extensive military underground network connecting all points of interest in the story. The Agarthians have technology based on vitalism and the Noosphere. Some hints were taken from the STALKER series of games on the mechanics of this magical element. A lot of genetic engineering is also involved to an exaggerated level, putting the story technically in the biopunk subgenre. I also considered having anti-gravity and teleportation elements, but at later development I realized these make the lore cumbersome and prone to plot holes. The idea might be recycled in the future.
 
-Maybe the player would be fighting in crazy science labs where the Agarthian technology is stored or imitated. Much like STALKER gets the player into underground labs with weird giant machines.
+Maybe the player would be fighting in crazy science labs where the Agarthian technology is studied or imitated. Much like STALKER gets the player into underground labs with weird giant machines.
 
 Apart from these descriptions, I would like to leave the proper writing and direction of the story and the art style to another artist I intended to have work with me eventually. I have written much as a placeholder to help me make decisions in gameplay and presentation, but I can't figure out coherent ideas.
 
