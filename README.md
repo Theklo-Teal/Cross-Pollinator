@@ -19,7 +19,7 @@ Command four characters as they explore the strange government projects in under
 Note that by the nature of not having a story well decided, different titles for this project are mentioned at different parts. The main working title is "Cross Pollinator" often shortened to "X-Poll". But "Chevron Detachment" is also used.
 
 This is part of my collection of projects in indefinite hiatus. I release it publicly in case someone likes the ideas and wants to develop them further or volunteers to work with me on them.
-See ![WHY IN HIATUS?]("#WHY-IN-HIATUS") for more information.
+See ![WHY IN HIATUS?]("#WHY_IN_HIATUS") for more information.
 
 
 # THE CONCEPT
@@ -77,7 +77,7 @@ Other scenes ("Levels/") and menus ("Menus/") can be tested in a similar way. Th
 
 In the "misc/" folder you can find some explanations of how the project is designed. For example, "Chevron_Detachment_Architecture.png" let's you know the interactions that make character control and the quest/interaction system work.
 
-# WHY IN HIATUS?
+# WHY_IN_HIATUS
 Items, equipment and character abilities might need some work and fine-tuning as the gameplay is better defined, but they didn't seem very hard to implement so far.
 
 The biggest showstopper has been NPC AI during combat. It's a form utility AI. I thought it would be simple. Just test positions within the field, by simulating all attacks to all characters, then picking the most effective one. But when I tried implementing this nothing worked in a plausibly smart way. NPCs move restlessly and inconsistently. There are plenty of ideas on how to fix this, but which combination of ideas would works as desired I don't know. It's pretty hard to test if AI is doing what you want, even if it looks right sometimes.
